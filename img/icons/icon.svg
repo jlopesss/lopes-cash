@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="44" fill="#0B1220"/>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B6FE3"/>
+      <stop offset="100%" stop-color="#5B8CFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Símbolo LC estilizado -->
+  <text x="96" y="128" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-weight="800" font-size="80" fill="url(#g)">LC</text>
+  <!-- Linha decorativa embaixo -->
+  <rect x="48" y="140" width="96" height="6" rx="3" fill="url(#g)" opacity="0.6"/>
+</svg>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0B1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Lopes Cash</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/img/icons/lopes-cash-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/img/icons/lopes-cash-icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/img/icons/lopes-cash-icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Banner offline ────────────────────────────────────── -->
+  <div id="offline-banner" class="offline-banner" hidden>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="23" y2="23"/>
+      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>
+    </svg>
+    Sem conexão · trabalhando offline
+  </div>
+
+  <!-- ── VIEW: HOME ─────────────────────────────────────────── -->
+  <div id="view-home" class="view" hidden>
+
+    <!-- Header -->
+    <div class="app-header">
+      <div class="app-header-left">
+        <div class="greeting"></div>
+        <div class="month-label"></div>
+      </div>
+      <button class="notif-btn" aria-label="Notificações">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" color="var(--text-muted)">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="hero-card">
+      <div class="hero-label label">SALDO DO MÊS</div>
+      <div class="hero-balance">
+        <span class="hero-currency num">R$</span>
+        <span class="hero-amount num" id="hero-amount">0</span>
+        <span class="hero-cents num" id="hero-cents">,00</span>
+      </div>
+
+      <div class="progress-wrapper">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-labels">
+          <span id="progress-used">0% usado</span>
+          <span id="progress-days">— dias restantes</span>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-grid-item">
+          <div class="hero-grid-label">
+            ORÇAMENTO
+            <button id="edit-budget-btn" class="edit-budget-btn" aria-label="Editar orçamento">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8.5 1.5l2 2L4 10H2V8L8.5 1.5z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hero-grid-val num" id="budget-val">R$ 0,00</div>
+        </div>
+        <div class="hero-grid-item">
+          <div class="hero-grid-label">GASTOS</div>
+          <div class="hero-grid-val spent num" id="spent-val">R$ 0,00</div>
+        </div>
+        <div class="hero-grid-item">
+          <div class="hero-grid-label">SALDO</div>
+          <div class="hero-grid-val success num" id="saldo-val">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="delta-pill" id="delta-pill" hidden>
+        <span class="delta-icon" id="delta-icon">↑</span>
+        <span class="delta-text" id="delta-text"></span>
+        <span class="delta-daily num" id="delta-daily"></span>
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="trend-card">
+      <div class="trend-header">
+        <span class="trend-title">Acumulado do mês</span>
+        <span class="trend-subtitle">vs orçamento</span>
+      </div>
+      <svg id="trend-chart" viewBox="0 0 260 70" preserveAspectRatio="none"></svg>
+      <div class="trend-xaxis" id="trend-xaxis">
+        <span>1</span><span>10</span><span class="today-label">hoje</span><span>30</span>
+      </div>
+    </div>
+
+    <!-- Últimos Gastos -->
+    <div class="last-expenses-section">
+      <div class="section-header">
+        <span class="section-title">Últimos gastos</span>
+        <button class="ver-tudo-btn" data-tab="historico">Ver tudo →</button>
+      </div>
+      <div id="expenses-list"></div>
+      <div id="empty-state" hidden>
+        <div class="empty-state">
+          <div class="empty-emoji">💸</div>
+          <div class="empty-title">Nenhum gasto ainda.</div>
+          <div class="empty-sub">Toque no + para começar.</div>
+          <div class="empty-arrow">↓</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /view-home -->
+
+
+  <!-- ── VIEW: HISTÓRICO ────────────────────────────────────── -->
+  <div id="view-historico" class="view" hidden>
+
+    <div class="historico-header">
+      <div class="label">HISTÓRICO</div>
+      <div class="historico-title">Todos os gastos</div>
+    </div>
+
+    <!-- Navegador de mês -->
+    <div class="month-nav">
+      <button class="month-nav-btn" id="hist-prev">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M7 1L1 7l6 6"/></svg>
+      </button>
+      <div class="month-nav-center">
+        <div class="month-nav-label" id="hist-month-label">—</div>
+        <div class="month-nav-sub"   id="hist-month-sub"></div>
+      </div>
+      <button class="month-nav-btn" id="hist-next">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M1 1l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <!-- Chips de filtro -->
+    <div class="chips-scroll" id="hist-chips"></div>
+
+    <!-- Lista agrupada -->
+    <div id="hist-expenses-list" class="hist-list-container"></div>
+
+    <!-- Footer Saldo -->
+    <div class="hist-footer-card" id="hist-footer" hidden>
+      <div class="hist-footer-left">
+        <div class="label-sm" id="hist-footer-label">SALDO</div>
+        <div class="hist-footer-val num" id="hist-footer-val">R$ 0</div>
+      </div>
+      <div class="hist-footer-right">
+        <div class="hist-footer-pct" id="hist-footer-pct">—</div>
+        <div class="hist-footer-bar-track">
+          <div class="hist-footer-bar" id="hist-footer-bar"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── VIEW: GRÁFICOS ─────────────────────────────────────── -->
+  <div id="view-graficos" class="view" hidden>
+
+    <div class="page-header">
+      <div class="label">GRÁFICOS</div>
+      <div class="page-title">Onde vai meu dinheiro</div>
+    </div>
+
+    <!-- Filtros mês / ano -->
+    <div class="graf-filters">
+      <button class="graf-filter-card" id="graf-month-btn">
+        <div class="label-sm">MÊS</div>
+        <div class="graf-filter-val" id="graf-month-val">—
+          <svg class="field-chevron" viewBox="0 0 9 9" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5l2.5 2.5 2.5-2.5"/></svg>
+        </div>
+      </button>
+      <div class="graf-filter-card">
+        <div class="label-sm">ANO</div>
+        <div class="graf-year-row">
+          <button class="graf-year-btn" id="graf-prev-year">‹</button>
+          <span class="graf-filter-val num" id="graf-year-val">2026</span>
+          <button class="graf-year-btn" id="graf-next-year">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut: Por categoria -->
+    <div class="graf-card" id="donut-card">
+      <div class="graf-card-header">
+        <span class="graf-card-title">Por categoria</span>
+        <span class="graf-card-period" id="donut-period"></span>
+      </div>
+
+      <div id="donut-layout">
+        <div class="donut-content">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 36 36" id="donut-svg" class="donut-svg"></svg>
+            <div class="donut-center">
+              <div class="donut-label"   id="donut-label">TOTAL</div>
+              <div class="donut-amount num" id="donut-amount">R$ 0,00</div>
+              <div class="donut-count"   id="donut-count">0 gastos</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+      </div>
+
+      <div class="donut-empty" id="donut-empty" hidden>Sem gastos neste mês.</div>
+    </div>
+
+    <!-- Bar chart: Por mês -->
+    <div class="graf-card">
+      <div class="graf-card-header">
+        <span class="graf-card-title" id="bar-title">Por mês</span>
+        <span class="bar-delta" id="bar-delta-badge" hidden></span>
+      </div>
+      <div class="bar-chart-container">
+        <svg viewBox="0 0 260 105" id="bar-svg" class="bar-svg"
+             preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="bar-footer">
+        <div>
+          <div class="bar-footer-label">Média mensal</div>
+          <div class="bar-footer-val num" id="bar-avg">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="bar-footer-label">Total no ano</div>
+          <div class="bar-footer-val num" id="bar-total">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── VIEW: PERFIL ───────────────────────────────────────── -->
+  <div id="view-perfil" class="view" hidden>
+
+    <div class="perfil-header">
+      <div class="label">PERFIL</div>
+      <div class="perfil-title">Minha conta</div>
+    </div>
+
+    <!-- Card do usuário -->
+    <div class="user-card">
+      <div class="user-avatar" id="perfil-avatar">LC</div>
+      <div class="user-info">
+        <div class="user-name"  id="perfil-name">—</div>
+        <div class="user-email" id="perfil-email">—</div>
+      </div>
+    </div>
+
+    <!-- Configurações -->
+    <div class="settings-list">
+      <button class="settings-item" data-tab="orcamentos">
+        <div class="settings-item-icon">💰</div>
+        <div class="settings-item-label">Orçamentos por mês</div>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
+             stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 1l5 5-5 5"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Logout -->
+    <div class="perfil-footer">
+      <button onclick="logout()" class="btn-danger">Sair da conta</button>
+    </div>
+
+  </div>
+
+
+  <!-- ── VIEW: ORÇAMENTOS POR MÊS ──────────────────────────── -->
+  <div id="view-orcamentos" class="view" hidden>
+
+    <div class="sub-header">
+      <button class="back-btn" data-tab="perfil" aria-label="Voltar">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M7 1L1 7l6 6"/></svg>
+      </button>
+      <div class="sub-header-text">
+        <div class="label">PERFIL · CONFIGURAÇÕES</div>
+        <div class="sub-header-title">Orçamentos por mês</div>
+      </div>
+    </div>
+
+    <!-- Orçamento padrão -->
+    <div class="default-budget-card">
+      <div class="default-budget-info">
+        <div class="label-sm" style="color:var(--primary-soft);margin-bottom:3px">PADRÃO</div>
+        <div class="default-budget-sub">Usado quando o mês não tem valor próprio</div>
+      </div>
+      <div class="default-budget-right">
+        <span class="num default-budget-val" id="default-budget-val">R$ 0,00</span>
+        <button class="edit-link" onclick="editDefaultBudget()">Editar</button>
+      </div>
+    </div>
+
+    <!-- Seletor de ano -->
+    <div class="year-selector">
+      <button class="year-btn" id="orc-prev-year">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M7 1L1 7l6 6"/></svg>
+      </button>
+      <span class="year-label num" id="orc-year">2026</span>
+      <button class="year-btn" id="orc-next-year">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+    </div>
+
+    <!-- Lista de meses -->
+    <div id="orc-months-list" class="orc-list"></div>
+
+  </div>
+
+
+  <!-- ── FAB ───────────────────────────────────────────────── -->
+  <button id="fab" class="fab" aria-label="Adicionar gasto">
+    <svg viewBox="0 0 26 26" fill="none" stroke="white" stroke-width="2.5"
+         stroke-linecap="round">
+      <line x1="13" y1="4" x2="13" y2="22"/>
+      <line x1="4"  y1="13" x2="22" y2="13"/>
+    </svg>
+  </button>
+
+
+  <!-- ── TAB BAR ───────────────────────────────────────────── -->
+  <nav class="tabbar" role="tablist">
+
+    <button class="tab" data-tab="home" role="tab" aria-label="Início">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" color="var(--primary)">
+        <path d="M3 9.5L11 3l8 6.5V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/>
+        <path d="M8 20V13h6v7"/>
+      </svg>
+      <span class="tab-label">Início</span>
+    </button>
+
+    <button class="tab" data-tab="historico" role="tab" aria-label="Histórico">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" color="var(--text-dimmest)">
+        <rect x="3" y="4" width="16" height="16" rx="2"/>
+        <path d="M16 2v4M6 2v4M3 10h16"/>
+        <path d="M8 14h1M11 14h1M14 14h1M8 17h1M11 17h1"/>
+      </svg>
+      <span class="tab-label">Histórico</span>
+    </button>
+
+    <button class="tab" data-tab="graficos" role="tab" aria-label="Gráficos">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" color="var(--text-dimmest)">
+        <path d="M18 18H4V4"/>
+        <path d="M7 14l3-4 3 3 4-6"/>
+      </svg>
+      <span class="tab-label">Gráficos</span>
+    </button>
+
+    <button class="tab" data-tab="perfil" role="tab" aria-label="Perfil">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" color="var(--text-dimmest)">
+        <circle cx="11" cy="8" r="4"/>
+        <path d="M3 19c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span class="tab-label">Perfil</span>
+    </button>
+
+  </nav>
+
+
+  <!-- ── MODAL: NOVO GASTO ─────────────────────────────────── -->
+  <div id="expense-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet expense-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="expense-header">
+        <span class="expense-title" id="expense-modal-title">Novo gasto</span>
+        <span class="expense-datetime" id="expense-datetime"></span>
+      </div>
+
+      <!-- Valor -->
+      <div class="amount-field">
+        <div class="label-sm" style="color:var(--primary-soft)">VALOR</div>
+        <div class="amount-input-row">
+          <span class="amount-currency num">R$</span>
+          <input id="expense-amount" type="text" class="amount-input num"
+                 inputmode="decimal" placeholder="0,00" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Categoria + Subcategoria -->
+      <div class="field-grid-2">
+        <button class="expense-field" id="cat-btn">
+          <div class="label-sm">CATEGORIA</div>
+          <div class="field-value placeholder" id="cat-value">Selecionar
+            <svg class="field-chevron" viewBox="0 0 9 9" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 3.5l2.5 2.5 2.5-2.5"/>
+            </svg>
+          </div>
+        </button>
+        <button class="expense-field" id="subcat-btn" disabled>
+          <div class="label-sm">SUBCATEGORIA</div>
+          <div class="field-value" id="subcat-value">—
+            <svg class="field-chevron" viewBox="0 0 9 9" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 3.5l2.5 2.5 2.5-2.5"/>
+            </svg>
+          </div>
+        </button>
+      </div>
+
+      <!-- Data -->
+      <button class="expense-field" id="date-trigger" style="margin-bottom:10px">
+        <div class="date-field-row">
+          <div class="date-field-left">
+            <div class="label-sm">DATA</div>
+            <div class="field-value" id="date-value" style="margin-top:2px"></div>
+          </div>
+          <span class="badge-today" id="badge-today">hoje</span>
+          <svg class="cal-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" style="margin-left:8px">
+            <rect x="1" y="3" width="14" height="12" rx="2"/>
+            <path d="M11 1v4M5 1v4M1 8h14"/>
+          </svg>
+        </div>
+        <input type="date" id="expense-date" class="date-hidden-input" tabindex="-1">
+      </button>
+
+      <!-- Descrição -->
+      <div class="expense-field" style="margin-bottom:10px">
+        <div class="label-sm">DESCRIÇÃO</div>
+        <input id="expense-desc" type="text" class="desc-input"
+               placeholder="Jantar com a Maria…" maxlength="200" autocomplete="off">
+      </div>
+
+      <!-- Parcelas -->
+      <div class="expense-field installment-field" style="margin-bottom:16px">
+        <div class="installment-main">
+          <label class="installment-check-label">
+            <input type="checkbox" id="installment-check">
+            <div class="custom-checkbox"></div>
+            <span>Repete em parcelas</span>
+          </label>
+          <span class="inst-badge num" id="inst-badge" hidden></span>
+        </div>
+
+        <div class="installment-detail" id="installment-detail" hidden>
+          <div class="installment-stepper">
+            <button class="stepper-btn" id="inst-minus">−</button>
+            <span class="inst-count num" id="inst-count">2</span>
+            <span class="inst-label">parcelas</span>
+            <button class="stepper-btn" id="inst-plus">+</button>
+          </div>
+          <div class="inst-preview-header" id="inst-preview-header">VER PARCELAS</div>
+          <div class="inst-preview-list" id="installment-preview"></div>
+        </div>
+      </div>
+
+      <!-- Salvar -->
+      <div class="expense-save">
+        <button id="save-expense-btn" class="btn-primary">Salvar gasto</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: SELETOR (categoria / subcategoria) ─────────── -->
+  <div id="cat-picker" class="modal-overlay" hidden>
+    <div class="modal-sheet picker-sheet">
+      <div class="modal-handle"></div>
+      <div class="picker-header">
+        <span class="picker-title" id="picker-title">Categoria</span>
+        <button class="picker-close" id="picker-close" aria-label="Fechar">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round">
+            <path d="M2 2l10 10M12 2L2 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="picker-list" id="picker-list"></div>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: ORÇAMENTO RÁPIDO ───────────────────────────── -->
+  <div id="budget-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet budget-sheet">
+      <div class="modal-handle"></div>
+      <div class="budget-modal-header" id="budget-modal-title">Orçamento</div>
+      <div class="budget-input-row">
+        <span class="num" style="font-size:16px;color:var(--text-dim)">R$</span>
+        <input type="number" id="budget-modal-input" class="budget-modal-input num"
+               step="0.01" min="0" placeholder="0,00" inputmode="decimal">
+      </div>
+      <button id="save-budget-btn" class="btn-primary">Salvar orçamento</button>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: CONFIRMAÇÃO (parcelas) ────────────────────── -->
+  <div id="confirm-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet confirm-sheet">
+      <div class="modal-handle"></div>
+      <div class="confirm-title" id="confirm-title">Esta é uma compra parcelada.</div>
+      <div class="confirm-sub">O que deseja fazer?</div>
+      <button class="confirm-btn confirm-btn-single" id="confirm-single">—</button>
+      <button class="confirm-btn confirm-btn-all"    id="confirm-all">—</button>
+      <button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">Cancelar</button>
+    </div>
+  </div>
+
+
+  <!-- ── TOAST ─────────────────────────────────────────────── -->
+  <div id="toast" class="toast" hidden></div>
+
+</div><!-- /app -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/db.js"></script>
+<script src="js/offline-queue.js"></script>
+<script src="js/home.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/perfil.js"></script>
+<script src="js/graficos.js"></script>
+<script src="js/expense-modal.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

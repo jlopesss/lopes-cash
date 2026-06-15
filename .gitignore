@@ -1,0 +1,12 @@
+# Handoff e referências visuais
+App de controle de gastos/
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

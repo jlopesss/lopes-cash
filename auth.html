@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0B1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Lopes Cash</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/img/icons/lopes-cash-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/img/icons/lopes-cash-icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/img/icons/lopes-cash-icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 38 38" fill="none">
+          <path d="M19 6C12 6 7 11 7 18c0 5 3 9.5 7.5 11.5V28h9v1.5C28 27.5 31 23 31 18c0-7-5-12-12-12z"
+                fill="white" opacity=".15"/>
+          <path d="M12 22c0-3.9 3.1-7 7-7s7 3.1 7 7H12z" fill="white" opacity=".3"/>
+          <circle cx="19" cy="15" r="3.5" fill="white" opacity=".9"/>
+          <rect x="15" y="27" width="8" height="2.5" rx="1.25" fill="white" opacity=".7"/>
+          <rect x="17" y="30" width="4" height="2" rx="1" fill="white" opacity=".5"/>
+        </svg>
+      </div>
+      <span class="auth-app-name">Lopes Cash</span>
+      <span class="auth-tagline">Controle seus gastos com inteligência</span>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card">
+
+      <!-- Form wrap -->
+      <div id="auth-form-wrap">
+        <!-- Abas -->
+        <div class="auth-tabs">
+          <button id="tab-login"  class="auth-tab active">Entrar</button>
+          <button id="tab-signup" class="auth-tab">Criar conta</button>
+        </div>
+
+        <!-- Formulário -->
+        <form id="auth-form" autocomplete="on" novalidate>
+          <div class="auth-fields">
+
+            <!-- Nome (só no signup) -->
+            <div class="auth-field" id="field-name" hidden>
+              <label class="auth-field-label" for="input-name">Nome</label>
+              <input id="input-name" type="text" name="name" placeholder="Seu nome"
+                     autocomplete="name" autocapitalize="words">
+            </div>
+
+            <!-- E-mail -->
+            <div class="auth-field">
+              <label class="auth-field-label" for="input-email">E-mail</label>
+              <input id="input-email" type="email" name="email" placeholder="seu@email.com"
+                     autocomplete="email" required>
+            </div>
+
+            <!-- Senha -->
+            <div class="auth-field">
+              <label class="auth-field-label" for="input-password">Senha</label>
+              <input id="input-password" type="password" name="password" placeholder="••••••••"
+                     autocomplete="current-password" required>
+            </div>
+
+          </div>
+
+          <p class="auth-error" id="auth-error"></p>
+
+          <div class="auth-submit">
+            <button type="submit" id="submit-btn" class="btn-primary">Entrar</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Estado de sucesso (após cadastro aguardando e-mail) -->
+      <div id="auth-success" hidden>
+        <div class="auth-success">
+          <div class="auth-success-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M5 13l4 4L19 7" stroke="#39E0A0" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="auth-success-title">Verifique seu e-mail</div>
+          <div class="auth-success-text">
+            Enviamos um link de confirmação para<br>
+            <strong id="success-email"></strong>.<br>
+            Clique no link para ativar sua conta.
+          </div>
+          <button class="auth-back-btn" onclick="document.getElementById('auth-success').hidden=true; document.getElementById('auth-form-wrap').hidden=false;">
+            Voltar ao login
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /auth-card -->
+  </div><!-- /auth-container -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
