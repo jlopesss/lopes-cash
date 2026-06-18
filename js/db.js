@@ -331,6 +331,15 @@ async function getYearlyData(year) {
 
 // ─────────────────────────────────────────────────────────────
 
+async function getExpenseInstallmentInfo(id) {
+  const { data } = await supabase
+    .from('expenses')
+    .select('installment_total, installment_group_id')
+    .eq('id', id)
+    .single();
+  return data;
+}
+
 async function deleteExpense(id, mode = 'single') {
   if (mode === 'single') {
     const { error } = await supabase.from('expenses')

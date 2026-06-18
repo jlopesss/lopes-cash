@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('tab-login').addEventListener('click',  () => setMode('login'));
   document.getElementById('tab-signup').addEventListener('click', () => setMode('signup'));
   document.getElementById('auth-form').addEventListener('submit', handleSubmit);
+
+  document.getElementById('toggle-pw').addEventListener('click', () => {
+    const input = document.getElementById('input-password');
+    const show  = input.type === 'password';
+    input.type  = show ? 'text' : 'password';
+    document.getElementById('eye-show').hidden = show;
+    document.getElementById('eye-hide').hidden = !show;
+  });
 });
 
 function setMode(mode) {

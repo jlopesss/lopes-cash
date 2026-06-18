@@ -266,13 +266,7 @@ async function saveExpense() {
   btn.disabled = true;
 
   if (_editId) {
-    // Modo edição — verifica se é parcela
-    const { data: existing } = await supabase
-      .from('expenses')
-      .select('installment_total, installment_group_id')
-      .eq('id', _editId)
-      .single();
-
+    const existing = await getExpenseInstallmentInfo(_editId);
     btn.disabled = false;
 
     if (existing?.installment_total > 1 && existing?.installment_group_id) {

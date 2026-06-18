@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0B1220">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Lopes Cash</title>
@@ -20,6 +21,12 @@
 </head>
 <body>
 <div id="app">
+
+  <!-- ── Banner demo ──────────────────────────────────────── -->
+  <div id="demo-banner" class="offline-banner" style="background:rgba(91,140,255,.15);color:#7BA3FF;border-bottom:1px solid rgba(91,140,255,.2);" hidden>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Modo demonstração — dados fictícios
+  </div>
 
   <!-- ── Banner offline ────────────────────────────────────── -->
   <div id="offline-banner" class="offline-banner" hidden>
@@ -545,6 +552,7 @@
 <script src="js/perfil.js"></script>
 <script src="js/graficos.js"></script>
 <script src="js/expense-modal.js"></script>
+<script src="js/demo-data.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

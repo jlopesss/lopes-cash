@@ -10,6 +10,24 @@ window.appState = {
 // ── Inicialização ────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+  // ── Modo demo (sem Supabase configurado) ───────────────────
+  if (window.DEMO_MODE) {
+    window.appState.user     = { id: 'demo-user', email: 'demo@lopescash.app' };
+    window.appState.profile  = { id: 'demo-user', name: 'Jhonatan', email: 'demo@lopescash.app', default_budget: 3000 };
+    window.appState.categories = await getCategories();
+
+    document.getElementById('demo-banner').hidden = false;
+
+    initTabBar(); initFAB(); initExpenseModal(); initBudgetModal();
+    initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
+    initOfflineBanner();
+
+    navigate(location.hash.slice(1) || 'home');
+    return;
+  }
+
+  // ── Fluxo normal (com Supabase) ────────────────────────────
   const { data: { session } } = await supabase.auth.getSession();
 
   if (!session) {
