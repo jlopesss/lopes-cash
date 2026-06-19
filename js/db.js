@@ -131,6 +131,26 @@ async function deleteCategory(id) {
   return { error };
 }
 
+async function insertSubcategory(categoryId, name) {
+  const { data: existing } = await supabase
+    .from('subcategories')
+    .select('id')
+    .eq('category_id', categoryId);
+  const { data, error } = await supabase
+    .from('subcategories')
+    .insert({ category_id: categoryId, user_id: uid(), name, position: existing?.length || 0 })
+    .select('id').single();
+  return { data, error };
+}
+
+async function deleteSubcategory(id) {
+  const { error } = await supabase
+    .from('subcategories')
+    .delete()
+    .eq('id', id).eq('user_id', uid());
+  return { error };
+}
+
 // ── Orçamento ────────────────────────────────────────────────
 
 async function getBudgetForMonth(year, month) {

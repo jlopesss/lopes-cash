@@ -345,14 +345,6 @@
           <path d="M1 1l5 5-5 5"/>
         </svg>
       </button>
-      <button class="settings-item" data-tab="categorias">
-        <div class="settings-item-icon">🏷️</div>
-        <div class="settings-item-label">Categorias</div>
-        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
-             stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">
-          <path d="M1 1l5 5-5 5"/>
-        </svg>
-      </button>
     </div>
 
     <!-- Logout -->
@@ -404,29 +396,6 @@
 
     <!-- Lista de meses -->
     <div id="orc-months-list" class="orc-list"></div>
-
-  </div>
-
-
-  <!-- ── VIEW: CATEGORIAS ─────────────────────────────────────── -->
-  <div id="view-categorias" class="view" hidden>
-
-    <div class="sub-header">
-      <button class="back-btn" data-tab="perfil" aria-label="Voltar">
-        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round"><path d="M7 1L1 7l6 6"/></svg>
-      </button>
-      <div class="sub-header-text">
-        <div class="label">PERFIL · CONFIGURAÇÕES</div>
-        <div class="sub-header-title">Categorias</div>
-      </div>
-    </div>
-
-    <div id="cat-manage-list" class="cat-manage-list"></div>
-
-    <div style="padding:16px">
-      <button id="add-cat-btn" class="btn-primary">+ Nova categoria</button>
-    </div>
 
   </div>
 
@@ -587,12 +556,20 @@
       <div class="modal-handle"></div>
       <div class="picker-header">
         <span class="picker-title" id="picker-title">Categoria</span>
-        <button class="picker-close" id="picker-close" aria-label="Fechar">
-          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round">
-            <path d="M2 2l10 10M12 2L2 12"/>
-          </svg>
-        </button>
+        <div class="picker-header-actions">
+          <button class="picker-add-cat-btn" id="picker-add-cat-btn" aria-label="Nova categoria" title="Nova categoria">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+              <path d="M7 1v12M1 7h12"/>
+            </svg>
+          </button>
+          <button class="picker-close" id="picker-close" aria-label="Fechar">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round">
+              <path d="M2 2l10 10M12 2L2 12"/>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="picker-list" id="picker-list"></div>
     </div>
@@ -674,8 +651,18 @@
         </div>
       </div>
 
+      <div class="cat-subs-section" id="cat-subs-section" hidden>
+        <div class="label-sm" style="color:var(--primary-soft);margin:8px 0 6px">SUBCATEGORIAS</div>
+        <div id="cat-subs-list" class="cat-subs-list"></div>
+        <div class="cat-sub-add-row">
+          <input type="text" id="cat-sub-add-input" class="desc-input"
+                 placeholder="Nova subcategoria…" maxlength="30" autocomplete="off">
+          <button type="button" id="cat-sub-add-btn" class="cat-sub-add-btn">+</button>
+        </div>
+      </div>
+
       <div style="padding:16px 0 4px">
-        <button id="cat-edit-save-btn" class="btn-primary">Salvar</button>
+        <button id="cat-edit-save-btn" class="btn-primary">Salvar categoria</button>
         <button id="cat-edit-delete-btn" class="cat-delete-btn" hidden>Excluir categoria</button>
       </div>
     </div>

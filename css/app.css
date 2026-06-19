@@ -692,7 +692,38 @@
   justify-content: center;
 }
 
+.picker-header-actions { display: flex; gap: 6px; align-items: center; }
+
+.picker-add-cat-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--bg-card-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.picker-add-cat-btn:active { background: var(--bg-card); }
+
 .picker-list { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; }
+
+.picker-item-row { display: flex; align-items: center; gap: 6px; }
+.picker-item-row .picker-item { flex: 1; }
+
+.picker-edit-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg-card-soft);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.picker-edit-btn:active { background: var(--bg-card); }
 
 .picker-item {
   display: flex;
@@ -1506,51 +1537,6 @@
   gap: 8px;
 }
 
-/* ── Categorias: lista de gestão ── */
-.cat-manage-list {
-  padding: 10px 16px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cat-manage-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--bg-card);
-  border-radius: 12px;
-  width: 100%;
-  text-align: left;
-  transition: background .15s;
-}
-.cat-manage-item:active { background: var(--bg-card-soft); }
-
-.cat-manage-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.cat-manage-info { flex: 1; min-width: 0; }
-
-.cat-manage-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.cat-manage-sub {
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 1px;
-}
-
 /* ── Modal editar categoria ── */
 .cat-edit-sheet { padding: 0 16px; }
 
@@ -1607,6 +1593,61 @@
   transition: background .15s;
 }
 .cat-delete-btn:active { background: rgba(255,84,112,.15); }
+
+/* ── Subcategorias no modal de categoria ── */
+.cat-subs-section {
+  margin-top: 8px;
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--border);
+}
+
+.cat-subs-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+
+.cat-subs-empty { font-size: 12px; color: var(--text-dim); padding: 4px 0; }
+
+.cat-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-app);
+  border-radius: 8px;
+}
+
+.cat-sub-name { flex: 1; font-size: 13px; font-weight: 500; }
+
+.cat-sub-delete-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255,84,112,.1);
+  color: var(--danger);
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cat-sub-delete-btn:active { background: rgba(255,84,112,.2); }
+
+.cat-sub-add-row { display: flex; gap: 8px; align-items: center; }
+.cat-sub-add-row .desc-input { flex: 1; }
+
+.cat-sub-add-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: white;
+  font-size: 22px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cat-sub-add-btn:active { opacity: .8; }
 
 /* ════════════════════════════════════════════════════════════
    SIDEBAR (oculta no mobile por padrão)

@@ -98,17 +98,26 @@ function openCategoryPicker() {
   const list = document.getElementById('picker-list');
 
   list.innerHTML = cats.map(cat => `
-    <button class="picker-item" data-cat-id="${cat.id}" onclick="selectCategory('${cat.id}')">
-      <span class="picker-item-emoji">${cat.emoji}</span>
-      <span class="picker-item-name">${escHtml(cat.name)}</span>
-      ${_selectedCat?.id === cat.id
-        ? `<svg class="picker-item-check" viewBox="0 0 16 16" fill="none">
-             <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-           </svg>` : ''}
-    </button>
+    <div class="picker-item-row">
+      <button class="picker-item" data-cat-id="${cat.id}" onclick="selectCategory('${cat.id}')">
+        <span class="picker-item-emoji">${cat.emoji}</span>
+        <span class="picker-item-name">${escHtml(cat.name)}</span>
+        ${_selectedCat?.id === cat.id
+          ? `<svg class="picker-item-check" viewBox="0 0 16 16" fill="none">
+               <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+             </svg>` : ''}
+      </button>
+      <button class="picker-edit-btn" onclick="openCatEditModal('${cat.id}')" aria-label="Editar categoria">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z"/>
+        </svg>
+      </button>
+    </div>
   `).join('');
 
   document.getElementById('picker-title').textContent = 'Categoria';
+  document.getElementById('picker-add-cat-btn').hidden = false;
   document.getElementById('cat-picker').hidden = false;
 }
 
@@ -147,6 +156,7 @@ function openSubcategoryPicker() {
   `).join('');
 
   document.getElementById('picker-title').textContent = 'Subcategoria';
+  document.getElementById('picker-add-cat-btn').hidden = true;
   document.getElementById('cat-picker').hidden = false;
 }
 

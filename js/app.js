@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initTabBar(); initFAB(); initExpenseModal(); initBudgetModal();
     initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
-    initOfflineBanner(); initEditName(); initCategorias();
+    initOfflineBanner(); initEditName(); initCatEditModal();
 
     navigate(location.hash.slice(1) || 'home');
     return;
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initConfirmModal();
   initOfflineBanner();
   initEditName();
-  initCategorias();
+  initCatEditModal();
 
   const initialView = location.hash.slice(1) || 'home';
   navigate(initialView);
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ── Navegação ─────────────────────────────────────────────────
 
 function navigate(view) {
-  const allowed = ['home', 'historico', 'graficos', 'perfil', 'orcamentos', 'categorias'];
+  const allowed = ['home', 'historico', 'graficos', 'perfil', 'orcamentos'];
   if (!allowed.includes(view)) view = 'home';
   if (location.hash !== '#' + view) {
     location.hash = view;
@@ -96,8 +96,8 @@ function showView(view) {
   const target = document.getElementById('view-' + view);
   if (target) target.hidden = false;
 
-  // Tab bar e sidebar: orcamentos e categorias herdam o active de perfil
-  const tabView = (view === 'orcamentos' || view === 'categorias') ? 'perfil' : view;
+  // Tab bar e sidebar: orcamentos herda o active de perfil
+  const tabView = view === 'orcamentos' ? 'perfil' : view;
   document.querySelectorAll('.tab, .sidebar-item').forEach(el => {
     el.classList.toggle('active', el.dataset.tab === tabView);
   });
@@ -108,7 +108,6 @@ function showView(view) {
   if (view === 'graficos')    renderGraficos();
   if (view === 'perfil')      renderPerfil();
   if (view === 'orcamentos')  renderOrcamentos();
-  if (view === 'categorias')  renderCategorias();
 }
 
 // ── Tab Bar ──────────────────────────────────────────────────
@@ -155,12 +154,15 @@ function initExpenseModal() {
   // Save
   document.getElementById('save-expense-btn').addEventListener('click', saveExpense);
 
-  // Category picker close
+  // Category picker close + add
   document.getElementById('cat-picker').addEventListener('click', e => {
     if (e.target === e.currentTarget) document.getElementById('cat-picker').hidden = true;
   });
   document.getElementById('picker-close').addEventListener('click', () => {
     document.getElementById('cat-picker').hidden = true;
+  });
+  document.getElementById('picker-add-cat-btn').addEventListener('click', () => {
+    openCatEditModal(null);
   });
 }
 
