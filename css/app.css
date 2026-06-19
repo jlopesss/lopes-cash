@@ -695,16 +695,21 @@
 .picker-header-actions { display: flex; gap: 6px; align-items: center; }
 
 .picker-add-cat-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--bg-card-soft);
-  color: var(--primary);
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  padding: 0 10px 0 8px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(91,140,255,.13);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  transition: background .15s;
 }
-.picker-add-cat-btn:active { background: var(--bg-card); }
+.picker-add-cat-btn:active { background: rgba(91,140,255,.22); }
 
 .picker-list { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; }
 
@@ -1597,57 +1602,68 @@
 /* ── Subcategorias no modal de categoria ── */
 .cat-subs-section {
   margin-top: 8px;
-  padding: 10px 0 4px;
+  padding: 12px 0 4px;
   border-top: 1px solid var(--border);
 }
 
 .cat-subs-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 
-.cat-subs-empty { font-size: 12px; color: var(--text-dim); padding: 4px 0; }
+.cat-subs-empty {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 6px 0;
+  font-style: italic;
+}
 
 .cat-sub-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 9px 8px 9px 12px;
   background: var(--bg-app);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
-.cat-sub-name { flex: 1; font-size: 13px; font-weight: 500; }
+.cat-sub-name { flex: 1; font-size: 13px; font-weight: 600; }
 
 .cat-sub-delete-btn {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: rgba(255,84,112,.1);
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(255,84,112,.09);
   color: var(--danger);
-  font-size: 16px;
-  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: background .15s;
 }
 .cat-sub-delete-btn:active { background: rgba(255,84,112,.2); }
 
-.cat-sub-add-row { display: flex; gap: 8px; align-items: center; }
+/* Row do input integrado com botão */
+.cat-sub-add-row {
+  display: flex;
+  align-items: center;
+  background: var(--bg-app);
+  border-radius: 10px;
+  padding: 10px 6px 10px 12px;
+  gap: 6px;
+}
 .cat-sub-add-row .desc-input { flex: 1; }
 
 .cat-sub-add-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: var(--primary);
   color: white;
-  font-size: 22px;
-  font-weight: 300;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: opacity .15s;
 }
-.cat-sub-add-btn:active { opacity: .8; }
+.cat-sub-add-btn:active { opacity: .75; }
 
 /* ════════════════════════════════════════════════════════════
    SIDEBAR (oculta no mobile por padrão)
