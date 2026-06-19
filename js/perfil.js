@@ -89,8 +89,8 @@ function _renderSubcatList(subs) {
     <div class="cat-sub-item">
       <span class="cat-sub-name">${escHtml(sub.name)}</span>
       <button class="cat-sub-delete-btn" data-sub-id="${sub.id}" aria-label="Remover">
-        <svg width="10" height="10" viewBox="0 0 12 12" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg width="7" height="7" viewBox="0 0 12 12" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M1 1l10 10M11 1L1 11"/>
         </svg>
       </button>

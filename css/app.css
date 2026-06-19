@@ -694,41 +694,57 @@
 
 .picker-header-actions { display: flex; gap: 6px; align-items: center; }
 
+/* Pill "Nova" no picker header */
 .picker-add-cat-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 10px 0 8px;
-  height: 28px;
-  border-radius: 8px;
-  background: rgba(91,140,255,.13);
+  gap: 4px;
+  padding: 0 9px 0 7px;
+  height: 26px;
+  border-radius: var(--radius-chip);
+  background: rgba(91,140,255,.1);
+  border: 1px solid rgba(91,140,255,.22);
   color: var(--primary);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: .03em;
+  letter-spacing: .04em;
   white-space: nowrap;
   transition: background .15s;
 }
-.picker-add-cat-btn:active { background: rgba(91,140,255,.22); }
+.picker-add-cat-btn:active { background: rgba(91,140,255,.2); }
 
 .picker-list { display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; }
 
-.picker-item-row { display: flex; align-items: center; gap: 6px; }
-.picker-item-row .picker-item { flex: 1; }
+/* Row unificado: item + zona de edição separada por divisor sutil */
+.picker-item-row {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-app);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.picker-item-row .picker-item {
+  flex: 1;
+  border-radius: 0;
+  background: transparent;
+  padding-right: 6px;
+}
 
 .picker-edit-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--bg-card-soft);
-  color: var(--text-dim);
+  width: 44px;
+  background: transparent;
+  border-left: 1px solid rgba(255,255,255,.05);
+  color: var(--text-dimmest);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background .15s;
+  transition: background .15s, color .15s;
 }
-.picker-edit-btn:active { background: var(--bg-card); }
+.picker-edit-btn:active {
+  background: rgba(91,140,255,.1);
+  color: var(--primary);
+}
 
 .picker-item {
   display: flex;
@@ -1601,60 +1617,79 @@
 
 /* ── Subcategorias no modal de categoria ── */
 .cat-subs-section {
-  margin-top: 8px;
-  padding: 12px 0 4px;
-  border-top: 1px solid var(--border);
+  margin-top: 10px;
+  padding: 12px 0 6px;
+  border-top: 1px solid rgba(255,255,255,.05);
 }
 
-.cat-subs-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+/* Chips que fluem em linha */
+.cat-subs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-height: 24px;
+}
 
 .cat-subs-empty {
-  font-size: 12px;
-  color: var(--text-dim);
-  padding: 6px 0;
+  font-size: 11px;
+  color: var(--text-dimmest);
   font-style: italic;
+  align-self: center;
 }
 
 .cat-sub-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 8px 9px 12px;
-  background: var(--bg-app);
-  border-radius: 10px;
+  gap: 5px;
+  padding: 5px 6px 5px 10px;
+  background: var(--bg-card-soft);
+  border-radius: var(--radius-chip);
+  border: 1px solid rgba(255,255,255,.06);
 }
 
-.cat-sub-name { flex: 1; font-size: 13px; font-weight: 600; }
+.cat-sub-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
 
+/* Bolinha × dentro do chip */
 .cat-sub-delete-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: rgba(255,84,112,.09);
-  color: var(--danger);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.08);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background .15s;
+  transition: background .15s, color .15s;
 }
-.cat-sub-delete-btn:active { background: rgba(255,84,112,.2); }
+.cat-sub-delete-btn:active {
+  background: rgba(255,84,112,.25);
+  color: var(--danger);
+}
 
-/* Row do input integrado com botão */
+/* Campo integrado com realce de foco */
 .cat-sub-add-row {
   display: flex;
   align-items: center;
-  background: var(--bg-app);
+  background: var(--bg-card-soft);
   border-radius: 10px;
-  padding: 10px 6px 10px 12px;
-  gap: 6px;
+  border: 1px solid rgba(255,255,255,.06);
+  padding: 0 4px 0 12px;
+  transition: border-color .2s;
 }
-.cat-sub-add-row .desc-input { flex: 1; }
+.cat-sub-add-row:focus-within { border-color: rgba(91,140,255,.5); }
+.cat-sub-add-row .desc-input { flex: 1; padding: 10px 0; }
 
 .cat-sub-add-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   background: var(--primary);
   color: white;
   display: flex;
