@@ -94,10 +94,10 @@ function showView(view) {
   const target = document.getElementById('view-' + view);
   if (target) target.hidden = false;
 
-  // Tab bar: orcamentos herda o active de perfil
+  // Tab bar e sidebar: orcamentos herda o active de perfil
   const tabView = view === 'orcamentos' ? 'perfil' : view;
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.classList.toggle('active', tab.dataset.tab === tabView);
+  document.querySelectorAll('.tab, .sidebar-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tabView);
   });
 
   window.appState.currentView = view;
@@ -122,6 +122,7 @@ function initTabBar() {
 
 function initFAB() {
   document.getElementById('fab').addEventListener('click', () => openExpenseModal());
+  document.getElementById('sidebar-add-btn')?.addEventListener('click', () => openExpenseModal());
 }
 
 // ── Expense Modal wiring ──────────────────────────────────────
