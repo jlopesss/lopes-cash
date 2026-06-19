@@ -681,11 +681,10 @@
 }
 
 .picker-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
   background: var(--bg-card-soft);
-  font-size: 18px;
   color: var(--text-muted);
   display: flex;
   align-items: center;
