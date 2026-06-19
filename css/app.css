@@ -244,7 +244,9 @@
   align-items: center;
   gap: 10px;
   padding: 6px 0;
+  cursor: pointer;
 }
+.expense-item:active { opacity: .65; }
 
 .expense-item + .expense-item {
   border-top: 1px solid var(--border-soft);
@@ -402,7 +404,8 @@
   color: var(--text-primary);
   background: none;
   border: none;
-  caret-color: var(--primary);
+  caret-color: transparent;
+  cursor: pointer;
   min-width: 0;
 }
 
@@ -1613,6 +1616,92 @@
   transition: background .15s;
 }
 .cat-delete-btn:active { background: rgba(255,84,112,.15); }
+
+/* ── Numpad ── */
+.numpad-overlay { align-items: flex-end; }
+
+.numpad-sheet {
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 -8px 48px rgba(0,0,0,.55);
+  animation: slide-up 260ms cubic-bezier(.2,.8,.25,1);
+}
+
+.numpad-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  min-height: 76px;
+}
+
+.numpad-currency {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.numpad-value {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--text-primary);
+  word-break: break-all;
+  text-align: right;
+  line-height: 1.1;
+}
+.numpad-value.numpad-empty { color: var(--text-dimmest); }
+
+.numpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.numpad-btn {
+  padding: 22px 0;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  text-align: center;
+  line-height: 1;
+  border-right: 1px solid rgba(255,255,255,.04);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  transition: background .1s;
+  user-select: none;
+}
+.numpad-btn:nth-child(3n) { border-right: none; }
+.numpad-btn:active { background: var(--bg-card-soft); }
+
+.numpad-sym { font-size: 30px; }
+.numpad-back { color: var(--text-dim); }
+
+.numpad-ok {
+  width: 100%;
+  padding: 18px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: white;
+  background: var(--primary);
+  transition: opacity .15s;
+}
+.numpad-ok:active { opacity: .82; }
+
+@media (min-width: 768px) {
+  .numpad-overlay { align-items: center; }
+  .numpad-sheet {
+    border-radius: 24px;
+    max-width: 320px;
+    animation: modal-pop 280ms cubic-bezier(.2,.8,.25,1);
+  }
+  .numpad-ok { border-radius: 0 0 24px 24px; }
+}
 
 /* ── Subcategorias no modal de categoria ── */
 .cat-subs-section {

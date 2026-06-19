@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('demo-banner').hidden = false;
 
-    initTabBar(); initFAB(); initExpenseModal(); initBudgetModal();
+    initTabBar(); initFAB(); initHome(); initExpenseModal(); initBudgetModal();
     initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
     initOfflineBanner(); initEditName(); initCatEditModal();
 
@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initTabBar();
   initFAB();
+  initHome();
   initExpenseModal();
   initBudgetModal();
   initHistorico();
@@ -133,6 +134,11 @@ function initExpenseModal() {
   // Fechar ao clicar no overlay
   document.getElementById('expense-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeExpenseModal();
+  });
+
+  document.getElementById('expense-amount').addEventListener('click', openNumpad);
+  document.getElementById('numpad-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) document.getElementById('numpad-modal').hidden = true;
   });
 
   document.getElementById('cat-btn').addEventListener('click', openCategoryPicker);

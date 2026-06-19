@@ -469,7 +469,7 @@
         <div class="amount-input-row">
           <span class="amount-currency num">R$</span>
           <input id="expense-amount" type="text" class="amount-input num"
-                 inputmode="decimal" placeholder="0,00" autocomplete="off">
+                 inputmode="none" placeholder="0,00" autocomplete="off" readonly>
         </div>
       </div>
 
@@ -671,6 +671,40 @@
         <button id="cat-edit-save-btn" class="btn-primary">Salvar categoria</button>
         <button id="cat-edit-delete-btn" class="cat-delete-btn" hidden>Excluir categoria</button>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: NUMPAD ───────────────────────────────────── -->
+  <div id="numpad-modal" class="modal-overlay numpad-overlay" hidden>
+    <div class="numpad-sheet">
+      <div class="numpad-display">
+        <span class="numpad-currency num">R$</span>
+        <span class="numpad-value num" id="numpad-value">0</span>
+      </div>
+      <div class="numpad-grid">
+        <button class="numpad-btn" onclick="numpadPress('1')">1</button>
+        <button class="numpad-btn" onclick="numpadPress('2')">2</button>
+        <button class="numpad-btn" onclick="numpadPress('3')">3</button>
+        <button class="numpad-btn" onclick="numpadPress('4')">4</button>
+        <button class="numpad-btn" onclick="numpadPress('5')">5</button>
+        <button class="numpad-btn" onclick="numpadPress('6')">6</button>
+        <button class="numpad-btn" onclick="numpadPress('7')">7</button>
+        <button class="numpad-btn" onclick="numpadPress('8')">8</button>
+        <button class="numpad-btn" onclick="numpadPress('9')">9</button>
+        <button class="numpad-btn numpad-sym" onclick="numpadPress(',')">
+          <span>,</span>
+        </button>
+        <button class="numpad-btn" onclick="numpadPress('0')">0</button>
+        <button class="numpad-btn numpad-back" onclick="numpadPress('⌫')">
+          <svg width="22" height="17" viewBox="0 0 26 20" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 2H22a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10L2 10l8-8z"/>
+            <path d="M18 7l-5 6M13 7l5 6"/>
+          </svg>
+        </button>
+      </div>
+      <button class="numpad-ok" onclick="numpadOk()">OK</button>
     </div>
   </div>
 

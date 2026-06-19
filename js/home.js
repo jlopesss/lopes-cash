@@ -185,6 +185,13 @@ function buildExpenseItem(e) {
   `;
 }
 
+function initHome() {
+  document.getElementById('expenses-list').addEventListener('click', e => {
+    const item = e.target.closest('.expense-item[data-id]');
+    if (item) openExpenseModal(item.dataset.id);
+  });
+}
+
 function escHtml(str) {
   if (!str) return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');

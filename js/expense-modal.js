@@ -4,6 +4,7 @@ let _selectedCat    = null;
 let _selectedSubcat = null;
 let _installments   = 1;
 let _editId         = null;
+let _numpadRaw      = '';
 
 // ── Abrir / Fechar ───────────────────────────────────────────
 
@@ -22,8 +23,8 @@ function openExpenseModal(expenseId = null) {
     `${now.getDate()} ${monthName(now.getMonth() + 1, true)} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
 
   // Reset campos
-  document.getElementById('expense-amount').value  = '';
-  document.getElementById('expense-amount').focus();
+  document.getElementById('expense-amount').value = '';
+  if (!expenseId) setTimeout(openNumpad, 120);
   document.getElementById('cat-value').textContent    = 'Selecionar';
   document.getElementById('cat-value').classList.add('placeholder');
   document.getElementById('subcat-value').textContent = '—';
@@ -77,6 +78,40 @@ async function loadExpenseForEdit(id) {
     updateInstBadge();
     updateInstPreview();
   }
+}
+
+// ── Numpad ───────────────────────────────────────────────────
+
+function openNumpad() {
+  _numpadRaw = document.getElementById('expense-amount').value.trim() || '';
+  _syncNumpadDisplay();
+  document.getElementById('numpad-modal').hidden = false;
+}
+
+function _syncNumpadDisplay() {
+  const el = document.getElementById('numpad-value');
+  el.textContent = _numpadRaw || '0';
+  el.classList.toggle('numpad-empty', !_numpadRaw);
+}
+
+function numpadPress(key) {
+  if (key === '⌫') {
+    _numpadRaw = _numpadRaw.slice(0, -1);
+  } else if (key === ',') {
+    if (!_numpadRaw.includes(',')) _numpadRaw = (_numpadRaw || '0') + ',';
+  } else {
+    const parts = _numpadRaw.split(',');
+    if (parts.length > 1 && parts[1].length >= 2) return;
+    if (_numpadRaw.length < 12) _numpadRaw += key;
+  }
+  _syncNumpadDisplay();
+}
+
+function numpadOk() {
+  const val = _numpadRaw.replace(/,$/, '');
+  document.getElementById('expense-amount').value = val;
+  document.getElementById('numpad-modal').hidden = true;
+  if (_installments > 1) { updateInstBadge(); updateInstPreview(); }
 }
 
 // ── Campo de data ────────────────────────────────────────────
