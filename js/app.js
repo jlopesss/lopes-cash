@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initTabBar(); initFAB(); initExpenseModal(); initBudgetModal();
     initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
-    initOfflineBanner();
+    initOfflineBanner(); initEditName(); initCategorias();
 
     navigate(location.hash.slice(1) || 'home');
     return;
@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initGraficos();
   initConfirmModal();
   initOfflineBanner();
+  initEditName();
+  initCategorias();
 
   const initialView = location.hash.slice(1) || 'home';
   navigate(initialView);
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ── Navegação ─────────────────────────────────────────────────
 
 function navigate(view) {
-  const allowed = ['home', 'historico', 'graficos', 'perfil', 'orcamentos'];
+  const allowed = ['home', 'historico', 'graficos', 'perfil', 'orcamentos', 'categorias'];
   if (!allowed.includes(view)) view = 'home';
   if (location.hash !== '#' + view) {
     location.hash = view;
@@ -94,18 +96,19 @@ function showView(view) {
   const target = document.getElementById('view-' + view);
   if (target) target.hidden = false;
 
-  // Tab bar e sidebar: orcamentos herda o active de perfil
-  const tabView = view === 'orcamentos' ? 'perfil' : view;
+  // Tab bar e sidebar: orcamentos e categorias herdam o active de perfil
+  const tabView = (view === 'orcamentos' || view === 'categorias') ? 'perfil' : view;
   document.querySelectorAll('.tab, .sidebar-item').forEach(el => {
     el.classList.toggle('active', el.dataset.tab === tabView);
   });
 
   window.appState.currentView = view;
-  if (view === 'home')       renderHome();
-  if (view === 'historico')  renderHistorico();
-  if (view === 'graficos')   renderGraficos();
-  if (view === 'perfil')     renderPerfil();
-  if (view === 'orcamentos') renderOrcamentos();
+  if (view === 'home')        renderHome();
+  if (view === 'historico')   renderHistorico();
+  if (view === 'graficos')    renderGraficos();
+  if (view === 'perfil')      renderPerfil();
+  if (view === 'orcamentos')  renderOrcamentos();
+  if (view === 'categorias')  renderCategorias();
 }
 
 // ── Tab Bar ──────────────────────────────────────────────────

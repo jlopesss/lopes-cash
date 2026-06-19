@@ -327,7 +327,10 @@
     <div class="user-card">
       <div class="user-avatar" id="perfil-avatar">LC</div>
       <div class="user-info">
-        <div class="user-name"  id="perfil-name">—</div>
+        <div class="user-name-wrap">
+          <div class="user-name" id="perfil-name">—</div>
+          <button id="edit-name-btn" class="edit-link">Editar</button>
+        </div>
         <div class="user-email" id="perfil-email">—</div>
       </div>
     </div>
@@ -337,6 +340,14 @@
       <button class="settings-item" data-tab="orcamentos">
         <div class="settings-item-icon">💰</div>
         <div class="settings-item-label">Orçamentos por mês</div>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
+             stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 1l5 5-5 5"/>
+        </svg>
+      </button>
+      <button class="settings-item" data-tab="categorias">
+        <div class="settings-item-icon">🏷️</div>
+        <div class="settings-item-label">Categorias</div>
         <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
              stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">
           <path d="M1 1l5 5-5 5"/>
@@ -393,6 +404,29 @@
 
     <!-- Lista de meses -->
     <div id="orc-months-list" class="orc-list"></div>
+
+  </div>
+
+
+  <!-- ── VIEW: CATEGORIAS ─────────────────────────────────────── -->
+  <div id="view-categorias" class="view" hidden>
+
+    <div class="sub-header">
+      <button class="back-btn" data-tab="perfil" aria-label="Voltar">
+        <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round"><path d="M7 1L1 7l6 6"/></svg>
+      </button>
+      <div class="sub-header-text">
+        <div class="label">PERFIL · CONFIGURAÇÕES</div>
+        <div class="sub-header-title">Categorias</div>
+      </div>
+    </div>
+
+    <div id="cat-manage-list" class="cat-manage-list"></div>
+
+    <div style="padding:16px">
+      <button id="add-cat-btn" class="btn-primary">+ Nova categoria</button>
+    </div>
 
   </div>
 
@@ -589,6 +623,61 @@
       <button class="confirm-btn confirm-btn-single" id="confirm-single">—</button>
       <button class="confirm-btn confirm-btn-all"    id="confirm-all">—</button>
       <button class="confirm-btn confirm-btn-cancel" id="confirm-cancel">Cancelar</button>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: EDITAR NOME ───────────────────────────────── -->
+  <div id="name-edit-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet budget-sheet">
+      <div class="budget-modal-header">Editar nome</div>
+      <div class="budget-input-row" style="margin-bottom:16px">
+        <input type="text" id="name-edit-input" class="budget-modal-input"
+               placeholder="Seu nome" maxlength="50" autocomplete="name">
+      </div>
+      <button id="save-name-btn" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: EDITAR CATEGORIA ───────────────────────────── -->
+  <div id="cat-edit-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet cat-edit-sheet">
+      <div class="cat-edit-header">
+        <span id="cat-edit-title" class="expense-title">Nova categoria</span>
+        <button id="cat-edit-close-btn" class="picker-close" aria-label="Fechar">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round">
+            <path d="M2 2l10 10M12 2L2 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="cat-edit-preview" id="cat-edit-preview">🏷️</div>
+
+      <div class="cat-edit-fields">
+        <div class="expense-field">
+          <div class="label-sm">EMOJI</div>
+          <input id="cat-edit-emoji-input" type="text" class="desc-input"
+                 placeholder="🏷️" maxlength="4" autocomplete="off">
+        </div>
+
+        <div class="expense-field" style="margin-top:8px">
+          <div class="label-sm">NOME</div>
+          <input id="cat-edit-name-input" type="text" class="desc-input"
+                 placeholder="Ex: Academia" maxlength="30" autocomplete="off">
+        </div>
+
+        <div class="expense-field" style="margin-top:8px">
+          <div class="label-sm">COR</div>
+          <div class="cat-color-grid" id="cat-color-grid"></div>
+        </div>
+      </div>
+
+      <div style="padding:16px 0 4px">
+        <button id="cat-edit-save-btn" class="btn-primary">Salvar</button>
+        <button id="cat-edit-delete-btn" class="cat-delete-btn" hidden>Excluir categoria</button>
+      </div>
     </div>
   </div>
 

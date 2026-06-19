@@ -89,6 +89,11 @@
             <button type="submit" id="submit-btn" class="btn-primary">Entrar</button>
           </div>
         </form>
+
+        <!-- Link esqueci senha (só no login) -->
+        <div id="forgot-pw-wrap" class="auth-footer">
+          <button id="forgot-pw-btn" class="auth-back-btn">Esqueci minha senha</button>
+        </div>
       </div>
 
       <!-- Estado de sucesso (após cadastro aguardando e-mail) -->
@@ -104,12 +109,55 @@
           <div class="auth-success-text">
             Enviamos um link de confirmação para<br>
             <strong id="success-email"></strong>.<br>
-            Clique no link para ativar sua conta.
+            Clique no link para ativar sua conta.<br>
+            <span style="font-size:11px;opacity:.6">Verifique também a pasta de spam.</span>
           </div>
           <button class="auth-back-btn" onclick="document.getElementById('auth-success').hidden=true; document.getElementById('auth-form-wrap').hidden=false;">
             Voltar ao login
           </button>
+          <button id="resend-email-btn" class="auth-back-btn" style="margin-top:6px;font-size:12px;opacity:.65">
+            Reenviar e-mail
+          </button>
         </div>
+      </div>
+
+      <!-- Estado: e-mail de recuperação enviado -->
+      <div id="auth-forgot-success" hidden>
+        <div class="auth-success">
+          <div class="auth-success-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M4 4h16v16H4z" stroke="#39E0A0" stroke-width="2" stroke-linejoin="round" fill="none"/>
+              <path d="M4 4l8 9 8-9" stroke="#39E0A0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="auth-success-title">E-mail enviado!</div>
+          <div class="auth-success-text">
+            Enviamos um link para redefinir sua senha para<br>
+            <strong id="forgot-success-email"></strong>.<br>
+            Verifique também a pasta de spam.
+          </div>
+          <button class="auth-back-btn" onclick="document.getElementById('auth-forgot-success').hidden=true; document.getElementById('auth-form-wrap').hidden=false;">
+            Voltar ao login
+          </button>
+        </div>
+      </div>
+
+      <!-- Estado: redefinir senha (via link do e-mail) -->
+      <div id="auth-recovery" hidden>
+        <form id="reset-pw-form">
+          <div style="padding:14px 0 16px;font-size:15px;font-weight:700">Redefinir senha</div>
+          <div class="auth-fields">
+            <div class="auth-field">
+              <label class="auth-field-label" for="input-new-password">NOVA SENHA</label>
+              <input id="input-new-password" type="password" placeholder="••••••••"
+                     autocomplete="new-password" required>
+            </div>
+          </div>
+          <p class="auth-error" id="recovery-error"></p>
+          <div class="auth-submit">
+            <button type="submit" id="reset-pw-btn" class="btn-primary">Salvar nova senha</button>
+          </div>
+        </form>
       </div>
 
     </div><!-- /auth-card -->

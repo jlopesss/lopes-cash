@@ -13,6 +13,155 @@ async function renderPerfil() {
   document.getElementById('perfil-avatar').textContent = initials;
 }
 
+// ── Editar nome ───────────────────────────────────────────────
+
+function initEditName() {
+  document.getElementById('edit-name-btn').addEventListener('click', () => {
+    document.getElementById('name-edit-input').value = window.appState.profile?.name || '';
+    document.getElementById('name-edit-modal').hidden = false;
+    setTimeout(() => document.getElementById('name-edit-input').focus(), 80);
+  });
+
+  document.getElementById('name-edit-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.hidden = true;
+  });
+
+  document.getElementById('save-name-btn').addEventListener('click', async () => {
+    const name = document.getElementById('name-edit-input').value.trim();
+    if (!name) { showToast('Informe seu nome.'); return; }
+    const { error } = await updateProfile({ name });
+    if (error) { showToast('Erro ao salvar.'); return; }
+    window.appState.profile.name = name;
+    document.getElementById('name-edit-modal').hidden = true;
+    renderPerfil();
+    showToast('Nome atualizado!', 'success');
+  });
+}
+
+// ── Categorias ────────────────────────────────────────────────
+
+const _CAT_COLORS = [
+  '#5B8CFF','#A78BFA','#3DB8FF','#F472B6','#39E0A0',
+  '#FF9F40','#7BA3FF','#FFB84D','#FF7C99','#8B5CF6',
+  '#C77DFF','#6B7A92','#FF5470','#22D3EE','#F59E0B',
+];
+
+let _editCatId    = null;
+let _editCatColor = _CAT_COLORS[0];
+
+async function renderCategorias() {
+  const cats = await getCategories();
+  window.appState.categories = cats;
+
+  const html = cats.map(cat => `
+    <button class="cat-manage-item" data-cat-id="${cat.id}">
+      <div class="cat-manage-icon" style="background:${cat.color}22">
+        <span>${cat.emoji}</span>
+      </div>
+      <div class="cat-manage-info">
+        <div class="cat-manage-name">${cat.name}</div>
+        ${cat.subcategories?.length
+          ? `<div class="cat-manage-sub">${cat.subcategories.length} subcategoria${cat.subcategories.length > 1 ? 's' : ''}</div>`
+          : ''}
+      </div>
+      <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
+           stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">
+        <path d="M1 1l5 5-5 5"/>
+      </svg>
+    </button>
+  `).join('');
+
+  document.getElementById('cat-manage-list').innerHTML = html;
+}
+
+function _renderCatColorGrid() {
+  document.getElementById('cat-color-grid').innerHTML = _CAT_COLORS.map(c => `
+    <button class="cat-color-swatch ${c === _editCatColor ? 'active' : ''}"
+            style="background:${c}" data-color="${c}" aria-label="${c}"></button>
+  `).join('');
+}
+
+function openCatEditModal(catId = null) {
+  const cat     = catId ? window.appState.categories.find(c => c.id === catId) : null;
+  _editCatId    = catId;
+  _editCatColor = cat?.color || _CAT_COLORS[0];
+
+  document.getElementById('cat-edit-title').textContent       = cat ? 'Editar categoria' : 'Nova categoria';
+  document.getElementById('cat-edit-emoji-input').value       = cat?.emoji || '';
+  document.getElementById('cat-edit-name-input').value        = cat?.name  || '';
+  document.getElementById('cat-edit-preview').textContent     = cat?.emoji || '🏷️';
+  document.getElementById('cat-edit-delete-btn').hidden       = !cat;
+
+  _renderCatColorGrid();
+  document.getElementById('cat-edit-modal').hidden = false;
+  setTimeout(() => document.getElementById('cat-edit-name-input').focus(), 80);
+}
+
+async function saveCatEdit() {
+  const emoji = document.getElementById('cat-edit-emoji-input').value.trim();
+  const name  = document.getElementById('cat-edit-name-input').value.trim();
+  if (!name)  { showToast('Informe o nome.');  return; }
+  if (!emoji) { showToast('Informe um emoji.'); return; }
+
+  const btn = document.getElementById('cat-edit-save-btn');
+  btn.disabled = true;
+
+  const fn = _editCatId
+    ? updateCategory(_editCatId, { name, emoji, color: _editCatColor })
+    : insertCategory({ name, emoji, color: _editCatColor });
+
+  const { error } = await fn;
+  btn.disabled = false;
+
+  if (error) { showToast('Erro: ' + error.message); return; }
+
+  document.getElementById('cat-edit-modal').hidden = true;
+  window.appState.categories = await getCategories();
+  renderCategorias();
+  showToast(_editCatId ? 'Categoria atualizada!' : 'Categoria criada!', 'success');
+}
+
+async function deleteCatEdit() {
+  if (!confirm('Excluir esta categoria? Gastos vinculados ficam sem categoria.')) return;
+
+  const { error } = await deleteCategory(_editCatId);
+  if (error) {
+    showToast('Não foi possível excluir.');
+    return;
+  }
+  document.getElementById('cat-edit-modal').hidden = true;
+  window.appState.categories = await getCategories();
+  renderCategorias();
+  showToast('Categoria excluída.', 'success');
+}
+
+function initCategorias() {
+  document.getElementById('cat-manage-list').addEventListener('click', e => {
+    const item = e.target.closest('[data-cat-id]');
+    if (item) openCatEditModal(item.dataset.catId);
+  });
+
+  document.getElementById('add-cat-btn').addEventListener('click', () => openCatEditModal());
+
+  const modal = document.getElementById('cat-edit-modal');
+  modal.addEventListener('click', e => { if (e.target === modal) modal.hidden = true; });
+  document.getElementById('cat-edit-close-btn').addEventListener('click', () => { modal.hidden = true; });
+
+  document.getElementById('cat-edit-emoji-input').addEventListener('input', e => {
+    document.getElementById('cat-edit-preview').textContent = e.target.value || '🏷️';
+  });
+
+  document.getElementById('cat-color-grid').addEventListener('click', e => {
+    const sw = e.target.closest('[data-color]');
+    if (!sw) return;
+    _editCatColor = sw.dataset.color;
+    _renderCatColorGrid();
+  });
+
+  document.getElementById('cat-edit-save-btn').addEventListener('click', saveCatEdit);
+  document.getElementById('cat-edit-delete-btn').addEventListener('click', deleteCatEdit);
+}
+
 // ── Orçamentos por mês ────────────────────────────────────────
 
 let _orcYear = new Date().getFullYear();

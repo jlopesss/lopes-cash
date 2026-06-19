@@ -1499,6 +1499,115 @@
 .offline-banner:not([hidden]) ~ .view { padding-top: 40px; }
 
 
+/* ── User name wrap (perfil) ── */
+.user-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Categorias: lista de gestão ── */
+.cat-manage-list {
+  padding: 10px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cat-manage-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  width: 100%;
+  text-align: left;
+  transition: background .15s;
+}
+.cat-manage-item:active { background: var(--bg-card-soft); }
+
+.cat-manage-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cat-manage-info { flex: 1; min-width: 0; }
+
+.cat-manage-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cat-manage-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+/* ── Modal editar categoria ── */
+.cat-edit-sheet { padding: 0 16px; }
+
+.cat-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 12px;
+}
+
+.cat-edit-preview {
+  font-size: 48px;
+  text-align: center;
+  line-height: 1.2;
+  padding: 8px 0 12px;
+}
+
+.cat-edit-fields { display: flex; flex-direction: column; }
+
+.cat-color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cat-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2.5px solid transparent;
+  transition: transform .1s, border-color .1s;
+}
+
+.cat-color-swatch:active { transform: scale(.9); }
+
+.cat-color-swatch.active {
+  border-color: white;
+  transform: scale(1.1);
+}
+
+.cat-delete-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--danger);
+  background: rgba(255,84,112,.08);
+  border: 1px solid rgba(255,84,112,.15);
+  text-align: center;
+  transition: background .15s;
+}
+.cat-delete-btn:active { background: rgba(255,84,112,.15); }
+
 /* ════════════════════════════════════════════════════════════
    SIDEBAR (oculta no mobile por padrão)
    ════════════════════════════════════════════════════════════ */

@@ -106,6 +106,31 @@ async function getCategories() {
   return data || [];
 }
 
+async function insertCategory({ name, emoji, color }) {
+  const cats = await getCategories();
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({ user_id: uid(), name, emoji, color, position: cats.length })
+    .select('id').single();
+  return { data, error };
+}
+
+async function updateCategory(id, fields) {
+  const { error } = await supabase
+    .from('categories')
+    .update(fields)
+    .eq('id', id).eq('user_id', uid());
+  return { error };
+}
+
+async function deleteCategory(id) {
+  const { error } = await supabase
+    .from('categories')
+    .delete()
+    .eq('id', id).eq('user_id', uid());
+  return { error };
+}
+
 // ── Orçamento ────────────────────────────────────────────────
 
 async function getBudgetForMonth(year, month) {
