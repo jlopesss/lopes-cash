@@ -39,8 +39,10 @@ function setMode(mode) {
   _mode = mode;
   document.getElementById('tab-login').classList.toggle('active',  mode === 'login');
   document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-  document.getElementById('field-name').hidden      = mode !== 'signup';
-  document.getElementById('forgot-pw-wrap').hidden  = mode !== 'login';
+  document.getElementById('field-name').hidden         = mode !== 'signup';
+  document.getElementById('field-email-confirm').hidden = mode !== 'signup';
+  document.getElementById('forgot-pw-wrap').hidden     = mode !== 'login';
+  if (mode === 'signup') document.getElementById('input-email-confirm').value = '';
   document.getElementById('submit-btn').textContent = mode === 'login' ? 'Entrar' : 'Criar conta';
   document.getElementById('auth-error').textContent = '';
 }
@@ -57,9 +59,20 @@ async function handleSubmit(e) {
   btn.textContent = _mode === 'login' ? 'Entrando…' : 'Criando conta…';
 
   if (_mode === 'signup') {
-    const name = document.getElementById('input-name').value.trim();
+    const name         = document.getElementById('input-name').value.trim();
+    const emailConfirm = document.getElementById('input-email-confirm').value.trim();
     if (!name) {
       errorEl.textContent = 'Informe seu nome.';
+      resetBtn(btn);
+      return;
+    }
+    if (!emailConfirm) {
+      errorEl.textContent = 'Confirme seu e-mail.';
+      resetBtn(btn);
+      return;
+    }
+    if (email !== emailConfirm) {
+      errorEl.textContent = 'Os e-mails não coincidem.';
       resetBtn(btn);
       return;
     }
