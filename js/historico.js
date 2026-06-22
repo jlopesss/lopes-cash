@@ -178,7 +178,13 @@ function handleHistDelete(id, isInst) {
       () => doHistDelete(id, 'all')
     );
   } else {
-    doHistDelete(id, 'single');
+    showConfirm(
+      'Excluir este lançamento?',
+      'Sim, excluir',
+      null,
+      () => doHistDelete(id, 'single'),
+      null
+    );
   }
 }
 

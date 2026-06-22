@@ -227,7 +227,8 @@ let _confirmCbs = { onSingle: null, onAll: null };
 function showConfirm(title, labelSingle, labelAll, onSingle, onAll) {
   document.getElementById('confirm-title').textContent  = title;
   document.getElementById('confirm-single').textContent = labelSingle;
-  document.getElementById('confirm-all').textContent    = labelAll;
+  document.getElementById('confirm-all').textContent    = labelAll || '';
+  document.getElementById('confirm-all').hidden         = !labelAll;
   _confirmCbs = { onSingle, onAll };
   document.getElementById('confirm-modal').hidden = false;
 }
