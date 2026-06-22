@@ -896,36 +896,10 @@
 
 /* ── Swipe item ── */
 .swipe-wrap {
-  position: relative;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 2px;
 }
-
-.swipe-actions {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 8px;
-}
-
-.swipe-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.swipe-btn svg { width: 16px; height: 16px; }
-
-.swipe-edit   { background: var(--primary); }
-.swipe-delete { background: var(--danger); }
 
 .swipe-inner {
   display: flex;
@@ -934,10 +908,24 @@
   padding: 8px 6px;
   background: var(--bg-app);
   border-radius: 12px;
-  position: relative;
-  z-index: 1;
-  will-change: transform;
+  cursor: pointer;
 }
+.swipe-inner:active { opacity: .7; }
+
+.hist-del-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--danger);
+  opacity: .45;
+  transition: opacity 150ms;
+}
+.hist-del-btn:active { opacity: 1; }
+.hist-del-btn svg { width: 15px; height: 15px; }
 
 /* ── Footer saldo (histórico) ── */
 .hist-footer-card {

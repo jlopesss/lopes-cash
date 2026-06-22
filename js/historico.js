@@ -129,18 +129,6 @@ function buildSwipeItem(e) {
 
   return `
     <div class="swipe-wrap" data-id="${e.id}" data-inst="${isInst}">
-      <div class="swipe-actions">
-        <button class="swipe-btn swipe-edit"   data-action="edit"   data-id="${e.id}" data-inst="${isInst}">
-          <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
-            <path d="M11 2l3 3L6 13H3v-3L11 2z"/>
-          </svg>
-        </button>
-        <button class="swipe-btn swipe-delete" data-action="delete" data-id="${e.id}" data-inst="${isInst}">
-          <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
-            <path d="M3 5h10M6 5V3h4v2M6 8v5M10 8v5M4 5l1 9h6l1-9"/>
-          </svg>
-        </button>
-      </div>
       <div class="swipe-inner">
         <div class="expense-icon" style="background:${color}22">${emoji}</div>
         <div class="expense-info">
@@ -148,6 +136,11 @@ function buildSwipeItem(e) {
           <div class="expense-sub">${sub}${time || relativeDate(e.date)}</div>
         </div>
         <div class="expense-amount num">-${formatCurrency(e.amount)}</div>
+        <button class="hist-del-btn" data-action="delete" data-id="${e.id}" data-inst="${isInst}" aria-label="Excluir">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M3 5h10M6 5V3h4v2M6 8v5M10 8v5M4 5l1 9h6l1-9"/>
+          </svg>
+        </button>
       </div>
     </div>`;
 }
@@ -155,77 +148,17 @@ function buildSwipeItem(e) {
 // ── Swipe gesture ─────────────────────────────────────────────
 
 function initSwipe(container) {
-  let startX, startY, swipeWrap, swipeInner, dragging = false;
-  let revealedWrap = null;
-
-  function snapBack(el) {
-    if (!el) return;
-    el.style.transition = 'transform 180ms ease';
-    el.style.transform  = 'translateX(0)';
-  }
-  function snapReveal(el) {
-    el.style.transition = 'transform 180ms ease';
-    el.style.transform  = 'translateX(-88px)';
-  }
-
-  container.addEventListener('touchstart', e => {
-    const w = e.target.closest('.swipe-wrap');
-    if (!w) { snapBack(revealedWrap?.querySelector('.swipe-inner')); revealedWrap = null; return; }
-    if (revealedWrap && revealedWrap !== w) {
-      snapBack(revealedWrap.querySelector('.swipe-inner'));
-      revealedWrap = null;
-    }
-    swipeWrap  = w;
-    swipeInner = w.querySelector('.swipe-inner');
-    startX     = e.touches[0].clientX;
-    startY     = e.touches[0].clientY;
-    dragging   = false;
-  }, { passive: true });
-
-  container.addEventListener('touchmove', e => {
-    if (!swipeInner) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    if (!dragging && Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy)) dragging = true;
-    if (!dragging) return;
-    if (dx < 0) {
-      swipeInner.style.transition = 'none';
-      swipeInner.style.transform  = `translateX(${Math.max(dx, -88)}px)`;
-    }
-  }, { passive: true });
-
-  container.addEventListener('touchend', e => {
-    if (!swipeInner || !dragging) {
-      swipeWrap = swipeInner = null; dragging = false;
-      return;
-    }
-    const dx = e.changedTouches[0].clientX - startX;
-    if (dx < -44) { snapReveal(swipeInner); revealedWrap = swipeWrap; }
-    else           { snapBack(swipeInner);  revealedWrap = null; }
-    swipeWrap = swipeInner = null; dragging = false;
-  }, { passive: true });
-
-  // Botões de ação
   container.addEventListener('click', e => {
     const btn = e.target.closest('[data-action]');
     if (btn) {
       e.stopPropagation();
-      snapBack(revealedWrap?.querySelector('.swipe-inner'));
-      revealedWrap = null;
       const id   = btn.dataset.id;
       const inst = btn.dataset.inst === 'true';
-      if (btn.dataset.action === 'edit')   handleHistEdit(id, inst);
       if (btn.dataset.action === 'delete') handleHistDelete(id, inst);
       return;
     }
-    // Tap no item (sem swipe) → editar
     const wrap = e.target.closest('.swipe-wrap');
-    if (wrap && !revealedWrap) {
-      handleHistEdit(wrap.dataset.id, wrap.dataset.inst === 'true');
-    } else if (revealedWrap) {
-      snapBack(revealedWrap.querySelector('.swipe-inner'));
-      revealedWrap = null;
-    }
+    if (wrap) handleHistEdit(wrap.dataset.id, wrap.dataset.inst === 'true');
   });
 }
 
