@@ -16,7 +16,7 @@ lopes-cash/
 ├── index.html          # SPA principal (views via hash: #home, #historico, #graficos, #perfil, #orcamentos)
 ├── auth.html           # Login / Cadastro
 ├── manifest.json       # PWA manifest com ícones oficiais
-├── sw.js               # Service Worker v4 (cache-first shell, network-first Supabase)
+├── sw.js               # Service Worker v10 (cache-first shell, network-first Supabase) — bumpar a cada deploy
 ├── vercel.json         # Headers: sw.js sem cache, imagens imutáveis
 ├── css/
 │   ├── tokens.css      # Design tokens (cores, sombras, keyframes)
@@ -28,11 +28,11 @@ lopes-cash/
 │   ├── utils.js        # formatCurrency, monthName, todayISO, isoDate, prevMonth
 │   ├── db.js           # Todas as queries Supabase (profiles, expenses, budgets, categories)
 │   ├── offline-queue.js# IndexedDB queue para gastos offline + syncPendingExpenses()
-│   ├── home.js         # View home (resumo mensal, últimos gastos, donut mini)
-│   ├── historico.js    # View histórico (swipe-to-delete, filtros por categoria)
-│   ├── perfil.js       # View perfil + view orçamentos
-│   ├── graficos.js     # View gráficos (donut animado + barras animadas)
-│   ├── expense-modal.js# Modal novo/editar gasto (parcelamento, categoria picker)
+│   ├── home.js         # View home (resumo mensal, últimos gastos clicáveis, donut mini)
+│   ├── historico.js    # View histórico (botão lixeira visível, filtros por categoria)
+│   ├── perfil.js       # View perfil + view orçamentos + CRUD de categorias/subcategorias
+│   ├── graficos.js     # View gráficos (donut animado + barras animadas) — agrupado por categoria
+│   ├── expense-modal.js# Modal novo/editar gasto (numpad customizado, parcelamento, categoria picker com CRUD inline)
 │   ├── app.js          # Bootstrap, roteador hash, tab bar, toast, confirm modal
 │   └── auth.js         # Login / Cadastro / Recuperar senha
 ├── img/icons/          # Ícones PWA oficiais (192, 512, maskable, SVG)
@@ -68,6 +68,35 @@ O banner "Sem conexão · trabalhando offline" fica visível enquanto offline.
 2. Rodar `sql/schema.sql` no SQL Editor
 3. Preencher `js/config.js` com `SUPABASE_URL` e `SUPABASE_ANON_KEY`
 4. Em **Authentication → URL Configuration**: adicionar a URL do Vercel em Site URL e Redirect URLs
+
+## Comportamentos importantes
+
+### Numpad customizado
+O campo de valor (`#expense-amount`) tem `readonly` + `inputmode="none"` para bloquear o teclado nativo.  
+Ao abrir novo gasto, `openNumpad()` é chamado com 120ms de delay (após animação do modal).  
+Estado: `_numpadRaw` (string). Máx 12 dígitos, máx 2 casas decimais. `numpadOk()` escreve no campo e fecha.
+
+### CRUD de categorias no picker
+O picker de categorias (`#cat-picker`) tem botão "Nova" e ícone de lápis em cada item.  
+`openCatEditModal(id)` abre o modal de edição; `openCatEditModal(null)` cria nova.  
+`closeCatEditModal()` verifica se o picker está aberto e o re-renderiza automaticamente via `openCategoryPicker()`.  
+Subcategorias são chips dentro do modal de edição da categoria.
+
+### Confirm modal flexível
+`showConfirm(title, labelSingle, labelAll, onSingle, onAll)` — quando `labelAll` é `null`, o segundo botão fica oculto.  
+Usado tanto para confirmação simples ("Excluir?") quanto para escolhas de parcelamento.
+
+### Histórico — excluir
+Cada item tem lixeira sempre visível (`.hist-del-btn`). Toque na lixeira → `showConfirm`.  
+Parcelados: confirmação com duas opções (só esta / todas). Simples: confirmação única.  
+Toque no corpo do item → abre modal de edição.
+
+### Gráficos
+Donut e barras agrupam por **categoria** (não subcategoria). Subcategoria é detalhe de organização, não aparece nos gráficos.
+
+### Service Worker
+`CACHE_NAME` em `sw.js` deve ser incrementado a cada deploy para invalidar o cache PWA.  
+Versão atual: `lopes-cash-v10`.
 
 ## Convenções de código
 
