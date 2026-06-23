@@ -350,7 +350,7 @@ async function getSubcategoryBreakdown(year, month) {
   const { start, end } = monthRange(year, month);
   const { data } = await supabase
     .from('expenses')
-    .select('amount, subcategory_id, subcategories(id, name), categories(id, name, emoji, color)')
+    .select('amount, category_id, subcategory_id, subcategories(id, name), categories(id, name, emoji, color)')
     .eq('user_id', uid())
     .gte('date', start)
     .lte('date', end);

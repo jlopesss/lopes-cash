@@ -40,10 +40,12 @@ async function renderHome() {
 function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent }) {
   // Saldo grande
   const { integer, cents } = splitCurrency(balance);
-  document.getElementById('hero-amount').textContent = (balance < 0 ? '-' : '') + integer;
+  const isNeg = balance < 0;
+  document.getElementById('hero-amount').textContent = (isNeg ? '-' : '') + integer;
   document.getElementById('hero-cents').textContent  = cents;
-  document.getElementById('hero-amount').style.color =
-    balance < 0 ? 'var(--danger)' : 'var(--text-primary)';
+  document.getElementById('hero-amount').style.color  = isNeg ? 'var(--danger)' : 'var(--text-primary)';
+  document.getElementById('hero-cents').style.color   = isNeg ? 'var(--danger)' : 'var(--text-dim)';
+  document.querySelector('.hero-currency').style.color = isNeg ? 'var(--danger)' : 'var(--text-secondary)';
 
   // Barra de progresso
   const usedPct = budget > 0 ? clamp((spent / budget) * 100, 0, 100) : 0;
@@ -62,7 +64,7 @@ function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent
   spentEl.textContent   = formatCurrency(spent);
 
   const saldoEl   = document.getElementById('saldo-val');
-  saldoEl.textContent   = formatCurrency(Math.abs(balance));
+  saldoEl.textContent   = (balance < 0 ? '-' : '') + formatCurrency(Math.abs(balance));
   saldoEl.className     = 'hero-grid-val num ' + (balance < 0 ? 'danger' : 'success');
 
   // Delta pill (só mostra se tem dado do mês anterior)
