@@ -1,3 +1,29 @@
+/* ── Pull to refresh ── */
+#pull-indicator {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-60px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  color: var(--text-dim);
+  padding: 7px 14px 7px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  will-change: transform;
+}
+#pull-indicator svg { width: 14px; height: 14px; flex-shrink: 0; transition: transform .2s; }
+#pull-indicator.pull-ready { color: var(--primary); border-color: rgba(91,140,255,.4); }
+#pull-indicator.pull-ready svg { transform: rotate(180deg); }
+#pull-indicator.pull-releasing { transition: transform .25s ease; }
+
 /* ── App Header ── */
 .app-header {
   display: flex;

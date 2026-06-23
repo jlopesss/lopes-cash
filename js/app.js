@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initTabBar(); initFAB(); initHome(); initExpenseModal(); initBudgetModal();
     initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
-    initOfflineBanner(); initEditName(); initCatEditModal();
+    initOfflineBanner(); initEditName(); initCatEditModal(); initPullToRefresh();
 
     navigate(location.hash.slice(1) || 'home');
     return;
@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initOfflineBanner();
   initEditName();
   initCatEditModal();
+  initPullToRefresh();
 
   const initialView = location.hash.slice(1) || 'home';
   navigate(initialView);
@@ -324,6 +325,60 @@ function initConfirmModal() {
   document.getElementById('confirm-cancel').addEventListener('click', () => {
     modal.hidden = true; _modalClose();
   });
+}
+
+// ── Pull to refresh ──────────────────────────────────────────
+
+function initPullToRefresh() {
+  const indicator = document.getElementById('pull-indicator');
+  const label     = document.getElementById('pull-label');
+  const THRESHOLD = 72;
+  let startY = 0;
+  let active = false;
+  let dist   = 0;
+
+  const app = document.getElementById('app');
+
+  app.addEventListener('touchstart', e => {
+    if (e.target.closest('.modal-overlay, .chips-scroll')) return;
+    const view = e.target.closest('.view');
+    if (!view || view.scrollTop > 2) return;
+    startY = e.touches[0].clientY;
+    active = true;
+    dist   = 0;
+    indicator.classList.remove('pull-releasing', 'pull-ready');
+  }, { passive: true });
+
+  app.addEventListener('touchmove', e => {
+    if (!active) return;
+    const view = e.target.closest('.view');
+    if (!view || view.scrollTop > 2) { active = false; return; }
+
+    dist = e.touches[0].clientY - startY;
+    if (dist <= 0) return;
+
+    const travel = Math.min(dist * 0.5, 48);
+    indicator.style.transform = `translateX(-50%) translateY(${travel - 60}px)`;
+    indicator.classList.toggle('pull-ready', dist >= THRESHOLD);
+    label.textContent = dist >= THRESHOLD ? 'Soltar para atualizar' : 'Puxar para atualizar';
+  }, { passive: true });
+
+  app.addEventListener('touchend', () => {
+    if (!active) return;
+    active = false;
+
+    if (dist >= THRESHOLD) {
+      label.textContent = 'Atualizando…';
+      indicator.style.transform = 'translateX(-50%) translateY(0)';
+      setTimeout(() => location.reload(), 350);
+    } else {
+      indicator.classList.add('pull-releasing');
+      indicator.style.transform = 'translateX(-50%) translateY(-60px)';
+      indicator.classList.remove('pull-ready');
+    }
+    startY = 0;
+    dist   = 0;
+  }, { passive: true });
 }
 
 // ── Logout ────────────────────────────────────────────────────
