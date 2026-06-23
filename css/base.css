@@ -49,6 +49,7 @@ a { color: inherit; text-decoration: none; }
   overflow-x: hidden;
   padding-bottom: 88px;
   scrollbar-width: none;
+  overscroll-behavior-y: none;
 }
 .view::-webkit-scrollbar { display: none; }
 

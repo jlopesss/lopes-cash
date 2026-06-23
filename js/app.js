@@ -349,19 +349,26 @@ function initPullToRefresh() {
     indicator.classList.remove('pull-releasing', 'pull-ready');
   }, { passive: true });
 
+  // passive: false para poder chamar preventDefault() e bloquear o scroll nativo
   app.addEventListener('touchmove', e => {
     if (!active) return;
     const view = e.target.closest('.view');
-    if (!view || view.scrollTop > 2) { active = false; return; }
+    if (!view) { active = false; return; }
+
+    // Se o usuário está scrollando para cima, cancela pull mode
+    if (view.scrollTop > 2) { active = false; return; }
 
     dist = e.touches[0].clientY - startY;
     if (dist <= 0) return;
+
+    // Bloqueia o scroll nativo / rubber-band do iOS enquanto puxando para baixo
+    e.preventDefault();
 
     const travel = Math.min(dist * 0.5, 48);
     indicator.style.transform = `translateX(-50%) translateY(${travel - 60}px)`;
     indicator.classList.toggle('pull-ready', dist >= THRESHOLD);
     label.textContent = dist >= THRESHOLD ? 'Soltar para atualizar' : 'Puxar para atualizar';
-  }, { passive: true });
+  }, { passive: false });
 
   app.addEventListener('touchend', () => {
     if (!active) return;
