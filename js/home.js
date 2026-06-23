@@ -48,13 +48,14 @@ function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent
   document.querySelector('.hero-currency').style.color = isNeg ? 'var(--danger)' : 'var(--text-secondary)';
 
   // Barra de progresso
-  const usedPct = budget > 0 ? clamp((spent / budget) * 100, 0, 100) : 0;
-  const fill    = document.getElementById('progress-fill');
-  fill.style.width = usedPct + '%';
+  const rawPct = budget > 0 ? (spent / budget) * 100 : 0;
+  const barPct = clamp(rawPct, 0, 100);
+  const fill   = document.getElementById('progress-fill');
+  fill.style.width = barPct + '%';
   fill.classList.toggle('danger', spent > budget);
 
   document.getElementById('progress-used').textContent =
-    `${usedPct.toFixed(1).replace('.', ',')}% usado`;
+    `${rawPct.toFixed(1).replace('.', ',')}% usado`;
   document.getElementById('progress-days').textContent =
     `${daysLeft} dia${daysLeft !== 1 ? 's' : ''} restante${daysLeft !== 1 ? 's' : ''}`;
 
