@@ -47,6 +47,7 @@ function openGrafMonthPicker() {
   }).join('');
   document.getElementById('picker-title').textContent = 'Selecionar mês';
   document.getElementById('cat-picker').hidden = false;
+  _modalOpen();
 
   // Listener temporário para itens de mês do gráfico
   list.addEventListener('click', function handler(e) {
@@ -55,6 +56,7 @@ function openGrafMonthPicker() {
     list.removeEventListener('click', handler);
     _grafMonth = parseInt(btn.dataset.grafMonth);
     document.getElementById('cat-picker').hidden = true;
+    _modalClose();
     renderGraficos();
   });
 }

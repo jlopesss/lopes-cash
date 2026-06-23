@@ -305,10 +305,12 @@ function openBudgetModalWith(title, currentAmount, onSave) {
     await onSave(amount);
     saveBtn.disabled = false;
     modal.hidden = true;
+    _modalClose();
     // Restaura handler padrão (home)
     saveBtn.onclick = saveBudget;
   };
 
   modal.hidden = false;
+  _modalOpen();
   setTimeout(() => document.getElementById('budget-modal-input').focus(), 100);
 }

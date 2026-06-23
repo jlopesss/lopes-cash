@@ -9,17 +9,31 @@ window.appState = {
 
 // ── Gerenciamento de histórico para modais (botão voltar) ─────
 
-let _modalDepth      = 0;
-let _historySkipNext = false;
+let _modalSessionActive = false;
+let _historySkipNext    = false;
+
+function _findTopmostModal() {
+  const order = [
+    'numpad-modal', 'cat-edit-modal', 'cat-picker',
+    'confirm-modal', 'budget-modal', 'name-edit-modal', 'expense-modal',
+  ];
+  for (const id of order) {
+    const el = document.getElementById(id);
+    if (el && !el.hidden) return el;
+  }
+  return null;
+}
 
 function _modalOpen() {
-  _modalDepth++;
-  history.pushState({ _m: _modalDepth }, '', location.href);
+  if (!_modalSessionActive) {
+    _modalSessionActive = true;
+    history.pushState({ lc_modal: true }, '', location.href);
+  }
 }
 
 function _modalClose() {
-  if (_modalDepth > 0) {
-    _modalDepth--;
+  if (_modalSessionActive && !_findTopmostModal()) {
+    _modalSessionActive = false;
     _historySkipNext = true;
     history.back();
   }
@@ -30,19 +44,17 @@ window.addEventListener('popstate', () => {
     _historySkipNext = false;
     return;
   }
-  if (_modalDepth > 0) {
-    _modalDepth--;
-    const order = [
-      'numpad-modal', 'cat-edit-modal', 'cat-picker',
-      'confirm-modal', 'budget-modal', 'name-edit-modal', 'expense-modal',
-    ];
-    for (const id of order) {
-      const el = document.getElementById(id);
-      if (el && !el.hidden) {
-        el.hidden = true;
-        return;
-      }
+  const top = _findTopmostModal();
+  if (top) {
+    top.hidden = true;
+    if (_findTopmostModal()) {
+      // Ainda há modais — re-empurra estado para o próximo voltar funcionar
+      history.pushState({ lc_modal: true }, '', location.href);
+    } else {
+      _modalSessionActive = false;
     }
+  } else {
+    _modalSessionActive = false;
   }
 });
 
