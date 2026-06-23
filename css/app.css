@@ -895,7 +895,7 @@
 
 /* ── Lista de gastos do histórico ── */
 .hist-list-container {
-  padding: 12px 16px 0;
+  padding: 12px 16px 176px;
 }
 
 .day-group { margin-bottom: 14px; }
@@ -940,15 +940,35 @@
 
 /* ── Footer saldo (histórico) ── */
 .hist-footer-card {
-  margin: 14px 16px 0;
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 398px;
   padding: 14px 16px;
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(91,140,255,.15), rgba(139,92,246,.08));
   border: 1px solid rgba(91,140,255,.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  z-index: 19;
+}
+
+/* FAB sobe quando o footer do histórico está visível */
+body.hist-active .fab {
+  bottom: 158px;
+}
+
+/* FAB só aparece na home e no histórico */
+body[data-view="graficos"] .fab,
+body[data-view="perfil"] .fab,
+body[data-view="orcamentos"] .fab {
+  display: none;
 }
 
 .hist-footer-left {}

@@ -166,6 +166,9 @@ function showView(view) {
     el.classList.toggle('active', el.dataset.tab === tabView);
   });
 
+  document.body.classList.toggle('hist-active', view === 'historico');
+  document.body.dataset.view = view;
+
   window.appState.currentView = view;
   if (view === 'home')        renderHome();
   if (view === 'historico')   renderHistorico();
@@ -258,7 +261,9 @@ function initBudgetModal() {
 // ── Gráficos wiring ──────────────────────────────────────────
 
 function initGraficos() {
-  document.getElementById('graf-month-btn').addEventListener('click', openGrafMonthPicker);
+  document.getElementById('graf-month-val').addEventListener('click', openGrafMonthPicker);
+  document.getElementById('graf-prev-month').addEventListener('click', () => changeGrafMonth(-1));
+  document.getElementById('graf-next-month').addEventListener('click', () => changeGrafMonth(1));
   document.getElementById('graf-prev-year').addEventListener('click', () => changeGrafYear(-1));
   document.getElementById('graf-next-year').addEventListener('click', () => changeGrafYear(1));
 }

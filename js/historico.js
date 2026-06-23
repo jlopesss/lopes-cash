@@ -202,20 +202,22 @@ function renderHistFooter(expenses, budgetData) {
   const footer = document.getElementById('hist-footer');
   if (expenses.length === 0) { footer.hidden = true; return; }
 
-  const total   = expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
-  const budget  = budgetData.amount;
-  const saldo   = budget - total;
-  const pctVal  = budget > 0 ? clamp((saldo / budget) * 100, 0, 100) : 0;
-  const isPos   = saldo >= 0;
+  const total    = expenses.reduce((s, e) => s + parseFloat(e.amount), 0);
+  const budget   = budgetData.amount;
+  const saldo    = budget - total;
+  const isPos    = saldo >= 0;
+  const spentPct = budget > 0 ? (total / budget) * 100 : 0;
+  const barPct   = clamp(spentPct, 0, 100);
 
   footer.hidden = false;
   document.getElementById('hist-footer-label').textContent =
     `SALDO · ${monthName(_histMonth, true).toUpperCase()}`;
-  document.getElementById('hist-footer-val').textContent = formatCurrency(saldo);
+  document.getElementById('hist-footer-val').textContent = formatCurrency(Math.abs(saldo));
   document.getElementById('hist-footer-val').style.color = isPos ? 'var(--primary-soft)' : 'var(--danger)';
-  document.getElementById('hist-footer-pct').textContent = `${pctVal.toFixed(0)}% do orçamento`;
+  document.getElementById('hist-footer-pct').textContent =
+    budget > 0 ? `${spentPct.toFixed(0)}% do orçamento` : '—';
 
   const bar = document.getElementById('hist-footer-bar');
-  bar.style.width      = pctVal + '%';
+  bar.style.width      = barPct + '%';
   bar.style.background = isPos ? 'var(--primary)' : 'var(--danger)';
 }

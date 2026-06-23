@@ -66,6 +66,14 @@ function changeGrafYear(delta) {
   renderGraficos();
 }
 
+function changeGrafMonth(delta) {
+  let m = _grafMonth + delta;
+  if (m > 12) { m = 1;  _grafYear++; }
+  if (m < 1)  { m = 12; _grafYear--; }
+  _grafMonth = m;
+  renderGraficos();
+}
+
 // ── Donut chart ───────────────────────────────────────────────
 
 function renderDonutChart(breakdown, total, count) {

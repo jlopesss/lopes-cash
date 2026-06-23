@@ -40,7 +40,7 @@ async function renderHome() {
 function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent }) {
   // Saldo grande
   const { integer, cents } = splitCurrency(balance);
-  document.getElementById('hero-amount').textContent = integer;
+  document.getElementById('hero-amount').textContent = (balance < 0 ? '-' : '') + integer;
   document.getElementById('hero-cents').textContent  = cents;
   document.getElementById('hero-amount').style.color =
     balance < 0 ? 'var(--danger)' : 'var(--text-primary)';

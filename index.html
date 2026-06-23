@@ -249,13 +249,14 @@
 
     <!-- Filtros mês / ano -->
     <div class="graf-filters">
-      <button class="graf-filter-card" id="graf-month-btn">
+      <div class="graf-filter-card">
         <div class="label-sm">MÊS</div>
-        <div class="graf-filter-val" id="graf-month-val">—
-          <svg class="field-chevron" viewBox="0 0 9 9" fill="none" stroke="currentColor"
-               stroke-width="1.5" stroke-linecap="round"><path d="M2 3.5l2.5 2.5 2.5-2.5"/></svg>
+        <div class="graf-year-row">
+          <button class="graf-year-btn" id="graf-prev-month">‹</button>
+          <span class="graf-filter-val" id="graf-month-val" style="cursor:pointer">—</span>
+          <button class="graf-year-btn" id="graf-next-month">›</button>
         </div>
-      </button>
+      </div>
       <div class="graf-filter-card">
         <div class="label-sm">ANO</div>
         <div class="graf-year-row">
