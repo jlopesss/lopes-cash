@@ -133,7 +133,7 @@
       <div class="hero-grid">
         <div class="hero-grid-item">
           <div class="hero-grid-label">
-            ORÇAMENTO
+            <span>ORÇAMENTO</span>
             <button id="edit-budget-btn" class="edit-budget-btn" aria-label="Editar orçamento">
               <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"
                    stroke-linecap="round" stroke-linejoin="round">
@@ -288,6 +288,30 @@
       </div>
 
       <div class="donut-empty" id="donut-empty" hidden>Sem gastos neste mês.</div>
+    </div>
+
+    <!-- Donut: Por subcategoria -->
+    <div class="graf-card" id="subcat-card">
+      <div class="graf-card-header">
+        <span class="graf-card-title">Por subcategoria</span>
+        <span class="graf-card-period" id="subcat-period"></span>
+      </div>
+
+      <div id="subcat-layout">
+        <div class="donut-content">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 36 36" id="subcat-svg" class="donut-svg"></svg>
+            <div class="donut-center">
+              <div class="donut-label">TOTAL</div>
+              <div class="donut-amount num" id="subcat-amount">R$ 0,00</div>
+              <div class="donut-count"   id="subcat-count">0 gastos</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="subcat-legend"></div>
+        </div>
+      </div>
+
+      <div class="donut-empty" id="subcat-empty" hidden>Sem gastos com subcategoria neste mês.</div>
     </div>
 
     <!-- Bar chart: Por mês -->

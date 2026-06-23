@@ -10,20 +10,23 @@ const CIRC = 87.96; // 2π × 14 (donut r=14)
 async function renderGraficos() {
   updateGrafFilters();
 
-  const [{ breakdown, total, count }, yearlyData] = await Promise.all([
+  const [{ breakdown, total, count }, subcatData, yearlyData] = await Promise.all([
     getCategoryBreakdown(_grafYear, _grafMonth),
+    getSubcategoryBreakdown(_grafYear, _grafMonth),
     getYearlyData(_grafYear),
   ]);
 
   renderDonutChart(breakdown, total, count);
+  renderSubcatChart(subcatData.breakdown, subcatData.total, subcatData.count);
   renderBarChart(yearlyData);
 }
 
 function updateGrafFilters() {
+  const periodLabel = `${monthName(_grafMonth, true)} · ${_grafYear}`;
   document.getElementById('graf-month-val').textContent = monthName(_grafMonth, false);
   document.getElementById('graf-year-val').textContent  = _grafYear;
-  document.getElementById('donut-period').textContent   =
-    `${monthName(_grafMonth, true)} · ${_grafYear}`;
+  document.getElementById('donut-period').textContent   = periodLabel;
+  document.getElementById('subcat-period').textContent  = periodLabel;
   document.getElementById('bar-title').textContent      = `Por mês · ${_grafYear}`;
 }
 
@@ -125,6 +128,74 @@ function renderDonutChart(breakdown, total, count) {
   });
 
   // Legenda
+  legend.innerHTML = slices.map(s => `
+    <div class="legend-item">
+      <span class="legend-dot" style="background:${s.color}"></span>
+      <span class="legend-name">${escHtml(s.name)}</span>
+      <span class="legend-val num">${formatCurrency(s.total)}</span>
+      <span class="legend-pct">${s.percentage.toFixed(0)}%</span>
+    </div>
+  `).join('');
+}
+
+// ── Subcat chart ──────────────────────────────────────────────
+
+function renderSubcatChart(breakdown, total, count) {
+  const svg    = document.getElementById('subcat-svg');
+  const legend = document.getElementById('subcat-legend');
+  const layout = document.getElementById('subcat-layout');
+  const empty  = document.getElementById('subcat-empty');
+
+  document.getElementById('subcat-amount').textContent =
+    total > 0 ? formatCurrency(total) : 'R$ 0,00';
+  document.getElementById('subcat-count').textContent =
+    `${count} gasto${count !== 1 ? 's' : ''}`;
+
+  if (breakdown.length === 0) {
+    svg.innerHTML = `
+      <circle r="14" cx="18" cy="18" fill="none" stroke="#0B1220" stroke-width="5"/>
+      <circle r="14" cx="18" cy="18" fill="none" stroke="#1A2638" stroke-width="5"
+        stroke-dasharray="${CIRC}" transform="rotate(-90 18 18)"/>`;
+    legend.innerHTML = '';
+    layout.hidden = true;
+    empty.hidden  = false;
+    return;
+  }
+
+  layout.hidden = false;
+  empty.hidden  = true;
+
+  let cumOffset = 0;
+  const slices = breakdown.slice(0, 8).map((item, i) => {
+    const len    = (item.total / total) * CIRC;
+    const offset = CIRC - cumOffset;
+    cumOffset += len;
+    return { ...item, len, offset, delay: i * 80 };
+  });
+
+  const bg = `<circle r="14" cx="18" cy="18" fill="none" stroke="#0B1220" stroke-width="5"/>`;
+
+  const fatias = slices.map(s => `
+    <circle class="donut-slice" r="14" cx="18" cy="18" fill="none"
+      stroke="${s.color}" stroke-width="5"
+      stroke-dasharray="0 ${CIRC}"
+      stroke-dashoffset="${s.offset}"
+      transform="rotate(-90 18 18)"
+      data-len="${s.len.toFixed(4)}"
+      data-delay="${s.delay}"/>`
+  ).join('');
+
+  svg.innerHTML = bg + fatias;
+
+  svg.querySelectorAll('.donut-slice').forEach(el => {
+    const len   = parseFloat(el.dataset.len);
+    const delay = parseInt(el.dataset.delay);
+    setTimeout(() => {
+      el.style.transition = 'stroke-dasharray 700ms ease-out';
+      el.style.strokeDasharray = `${len} ${CIRC - len}`;
+    }, delay + 50);
+  });
+
   legend.innerHTML = slices.map(s => `
     <div class="legend-item">
       <span class="legend-dot" style="background:${s.color}"></span>

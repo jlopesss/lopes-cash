@@ -55,6 +55,7 @@ function relativeDate(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   const date = new Date(y, m - 1, d);
   const diff = Math.round((today - date) / 86400000);
+  if (diff < 0)   return `${d} ${MONTHS_SHORT[m - 1]}`;
   if (diff === 0) return 'Hoje';
   if (diff === 1) return 'Ontem';
   if (diff < 7)   return `${diff} dias atrás`;

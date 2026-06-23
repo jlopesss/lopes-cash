@@ -1,10 +1,11 @@
 // ── Estado do modal ──────────────────────────────────────────
 
-let _selectedCat    = null;
-let _selectedSubcat = null;
-let _installments   = 1;
-let _editId         = null;
-let _numpadRaw      = '';
+let _selectedCat     = null;
+let _selectedSubcat  = null;
+let _installments    = 1;
+let _editId          = null;
+let _numpadRaw       = '';
+let _numpadOpenTimer = null;
 
 // ── Abrir / Fechar ───────────────────────────────────────────
 
@@ -16,6 +17,7 @@ function openExpenseModal(expenseId = null) {
 
   const modal = document.getElementById('expense-modal');
   modal.hidden = false;
+  _modalOpen();
 
   // Data/hora atual no header
   const now = new Date();
@@ -24,7 +26,7 @@ function openExpenseModal(expenseId = null) {
 
   // Reset campos
   document.getElementById('expense-amount').value = '';
-  if (!expenseId) setTimeout(openNumpad, 120);
+  if (!expenseId) _numpadOpenTimer = setTimeout(openNumpad, 120);
   document.getElementById('cat-value').textContent    = 'Selecionar';
   document.getElementById('cat-value').classList.add('placeholder');
   document.getElementById('subcat-value').textContent = '—';
@@ -44,7 +46,9 @@ function openExpenseModal(expenseId = null) {
 }
 
 function closeExpenseModal() {
+  clearTimeout(_numpadOpenTimer);
   document.getElementById('expense-modal').hidden = true;
+  _modalClose();
 }
 
 // ── Pré-carrega para edição ──────────────────────────────────
@@ -83,9 +87,11 @@ async function loadExpenseForEdit(id) {
 // ── Numpad ───────────────────────────────────────────────────
 
 function openNumpad() {
+  if (document.getElementById('expense-modal').hidden) return;
   _numpadRaw = document.getElementById('expense-amount').value.trim() || '';
   _syncNumpadDisplay();
   document.getElementById('numpad-modal').hidden = false;
+  _modalOpen();
 }
 
 function _syncNumpadDisplay() {
@@ -111,6 +117,7 @@ function numpadOk() {
   const val = _numpadRaw.replace(/,$/, '');
   document.getElementById('expense-amount').value = val;
   document.getElementById('numpad-modal').hidden = true;
+  _modalClose();
   if (_installments > 1) { updateInstBadge(); updateInstPreview(); }
 }
 
@@ -129,8 +136,10 @@ function setDateField(isoStr) {
 // ── Seleção de categoria ─────────────────────────────────────
 
 function openCategoryPicker() {
-  const cats = window.appState.categories;
-  const list = document.getElementById('picker-list');
+  const cats    = window.appState.categories;
+  const list    = document.getElementById('picker-list');
+  const picker  = document.getElementById('cat-picker');
+  const wasHidden = picker.hidden;
 
   list.innerHTML = cats.map(cat => `
     <div class="picker-item-row">
@@ -153,7 +162,8 @@ function openCategoryPicker() {
 
   document.getElementById('picker-title').textContent = 'Categoria';
   document.getElementById('picker-add-cat-btn').hidden = false;
-  document.getElementById('cat-picker').hidden = false;
+  picker.hidden = false;
+  if (wasHidden) _modalOpen();
 }
 
 function selectCategory(catId, catObj = null, closePicker = true) {
@@ -171,7 +181,7 @@ function selectCategory(catId, catObj = null, closePicker = true) {
   const subcatBtn = document.getElementById('subcat-btn');
   subcatBtn.disabled = !cat.subcategories || cat.subcategories.length === 0;
 
-  if (closePicker) document.getElementById('cat-picker').hidden = true;
+  if (closePicker) { document.getElementById('cat-picker').hidden = true; _modalClose(); }
 }
 
 // ── Seleção de subcategoria ──────────────────────────────────
@@ -179,6 +189,8 @@ function selectCategory(catId, catObj = null, closePicker = true) {
 function openSubcategoryPicker() {
   if (!_selectedCat || !_selectedCat.subcategories?.length) return;
 
+  const picker  = document.getElementById('cat-picker');
+  const wasHidden = picker.hidden;
   const list = document.getElementById('picker-list');
   list.innerHTML = _selectedCat.subcategories.map(sub => `
     <button class="picker-item" onclick="selectSubcategory('${sub.id}')">
@@ -192,7 +204,8 @@ function openSubcategoryPicker() {
 
   document.getElementById('picker-title').textContent = 'Subcategoria';
   document.getElementById('picker-add-cat-btn').hidden = true;
-  document.getElementById('cat-picker').hidden = false;
+  picker.hidden = false;
+  if (wasHidden) _modalOpen();
 }
 
 function selectSubcategory(subId, subObj = null) {
@@ -203,6 +216,7 @@ function selectSubcategory(subId, subObj = null) {
   _selectedSubcat = sub;
   document.getElementById('subcat-value').textContent = sub.name;
   document.getElementById('cat-picker').hidden = true;
+  _modalClose();
 }
 
 // ── Parcelas ─────────────────────────────────────────────────

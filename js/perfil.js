@@ -19,11 +19,12 @@ function initEditName() {
   document.getElementById('edit-name-btn').addEventListener('click', () => {
     document.getElementById('name-edit-input').value = window.appState.profile?.name || '';
     document.getElementById('name-edit-modal').hidden = false;
+    _modalOpen();
     setTimeout(() => document.getElementById('name-edit-input').focus(), 80);
   });
 
   document.getElementById('name-edit-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) e.currentTarget.hidden = true;
+    if (e.target === e.currentTarget) { e.currentTarget.hidden = true; _modalClose(); }
   });
 
   document.getElementById('save-name-btn').addEventListener('click', async () => {
@@ -33,6 +34,7 @@ function initEditName() {
     if (error) { showToast('Erro ao salvar.'); return; }
     window.appState.profile.name = name;
     document.getElementById('name-edit-modal').hidden = true;
+    _modalClose();
     renderPerfil();
     showToast('Nome atualizado!', 'success');
   });
@@ -76,6 +78,7 @@ function openCatEditModal(catId = null) {
 
   _renderCatColorGrid();
   document.getElementById('cat-edit-modal').hidden = false;
+  _modalOpen();
   setTimeout(() => document.getElementById('cat-edit-name-input').focus(), 80);
 }
 
@@ -118,6 +121,7 @@ async function addSubcat() {
 
 function closeCatEditModal() {
   document.getElementById('cat-edit-modal').hidden = true;
+  _modalClose();
   if (!document.getElementById('cat-picker').hidden) {
     openCategoryPicker();
   }

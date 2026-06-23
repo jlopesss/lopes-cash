@@ -132,13 +132,23 @@
   letter-spacing: .15em;
   text-transform: uppercase;
   color: var(--text-dim);
+  overflow: hidden;
+}
+
+.hero-grid-label > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .edit-budget-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 2px;
+  flex-shrink: 0;
 }
 .edit-budget-btn svg { width: 10px; height: 10px; color: var(--primary); }
 
@@ -1426,7 +1436,7 @@
 }
 
 .legend-name {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--text-secondary);
   flex: 1;
   min-width: 0;
@@ -1436,16 +1446,16 @@
 }
 
 .legend-val {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
 }
 
 .legend-pct {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--text-muted);
-  min-width: 22px;
+  min-width: 26px;
   text-align: right;
 }
 

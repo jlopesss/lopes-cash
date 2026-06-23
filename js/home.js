@@ -222,6 +222,7 @@ async function openBudgetModal() {
     `Orçamento de ${monthName(month)}`;
   document.getElementById('budget-modal-input').value = amount > 0 ? amount : '';
   modal.hidden = false;
+  _modalOpen();
   setTimeout(() => document.getElementById('budget-modal-input').focus(), 100);
 }
 
@@ -242,5 +243,6 @@ async function saveBudget() {
   if (error) { showToast('Erro ao salvar: ' + error.message); return; }
 
   document.getElementById('budget-modal').hidden = true;
+  _modalClose();
   renderHome();
 }

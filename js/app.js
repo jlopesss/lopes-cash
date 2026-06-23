@@ -7,6 +7,45 @@ window.appState = {
   currentView: null,
 };
 
+// ── Gerenciamento de histórico para modais (botão voltar) ─────
+
+let _modalDepth      = 0;
+let _historySkipNext = false;
+
+function _modalOpen() {
+  _modalDepth++;
+  history.pushState({ _m: _modalDepth }, '', location.href);
+}
+
+function _modalClose() {
+  if (_modalDepth > 0) {
+    _modalDepth--;
+    _historySkipNext = true;
+    history.back();
+  }
+}
+
+window.addEventListener('popstate', () => {
+  if (_historySkipNext) {
+    _historySkipNext = false;
+    return;
+  }
+  if (_modalDepth > 0) {
+    _modalDepth--;
+    const order = [
+      'numpad-modal', 'cat-edit-modal', 'cat-picker',
+      'confirm-modal', 'budget-modal', 'name-edit-modal', 'expense-modal',
+    ];
+    for (const id of order) {
+      const el = document.getElementById(id);
+      if (el && !el.hidden) {
+        el.hidden = true;
+        return;
+      }
+    }
+  }
+});
+
 // ── Inicialização ────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -138,7 +177,10 @@ function initExpenseModal() {
 
   document.getElementById('expense-amount').addEventListener('click', openNumpad);
   document.getElementById('numpad-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) document.getElementById('numpad-modal').hidden = true;
+    if (e.target === e.currentTarget) {
+      document.getElementById('numpad-modal').hidden = true;
+      _modalClose();
+    }
   });
 
   document.getElementById('cat-btn').addEventListener('click', openCategoryPicker);
@@ -162,10 +204,14 @@ function initExpenseModal() {
 
   // Category picker close + add
   document.getElementById('cat-picker').addEventListener('click', e => {
-    if (e.target === e.currentTarget) document.getElementById('cat-picker').hidden = true;
+    if (e.target === e.currentTarget) {
+      document.getElementById('cat-picker').hidden = true;
+      _modalClose();
+    }
   });
   document.getElementById('picker-close').addEventListener('click', () => {
     document.getElementById('cat-picker').hidden = true;
+    _modalClose();
   });
   document.getElementById('picker-add-cat-btn').addEventListener('click', () => {
     openCatEditModal(null);
@@ -176,7 +222,10 @@ function initExpenseModal() {
 
 function initBudgetModal() {
   document.getElementById('budget-modal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) document.getElementById('budget-modal').hidden = true;
+    if (e.target === e.currentTarget) {
+      document.getElementById('budget-modal').hidden = true;
+      _modalClose();
+    }
   });
   document.getElementById('save-budget-btn').addEventListener('click', saveBudget);
   document.getElementById('edit-budget-btn').addEventListener('click', openBudgetModal);
@@ -231,19 +280,20 @@ function showConfirm(title, labelSingle, labelAll, onSingle, onAll) {
   document.getElementById('confirm-all').hidden         = !labelAll;
   _confirmCbs = { onSingle, onAll };
   document.getElementById('confirm-modal').hidden = false;
+  _modalOpen();
 }
 
 function initConfirmModal() {
   const modal = document.getElementById('confirm-modal');
-  modal.addEventListener('click', e => { if (e.target === modal) modal.hidden = true; });
+  modal.addEventListener('click', e => { if (e.target === modal) { modal.hidden = true; _modalClose(); } });
   document.getElementById('confirm-single').addEventListener('click', () => {
-    modal.hidden = true; _confirmCbs.onSingle?.();
+    modal.hidden = true; _modalClose(); _confirmCbs.onSingle?.();
   });
   document.getElementById('confirm-all').addEventListener('click', () => {
-    modal.hidden = true; _confirmCbs.onAll?.();
+    modal.hidden = true; _modalClose(); _confirmCbs.onAll?.();
   });
   document.getElementById('confirm-cancel').addEventListener('click', () => {
-    modal.hidden = true;
+    modal.hidden = true; _modalClose();
   });
 }
 

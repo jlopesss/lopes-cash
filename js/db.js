@@ -223,6 +223,7 @@ async function getLastExpenses(limit = 5) {
     .from('expenses')
     .select('*, categories(id,name,emoji,color), subcategories(id,name)')
     .eq('user_id', uid())
+    .lte('date', todayISO())
     .order('date', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(limit);
@@ -295,12 +296,14 @@ async function updateExpense(id, fields, mode = 'single') {
   }
 
   // mode === 'all': busca group_id e atualiza todo o grupo
+  // Preserva as datas individuais de cada parcela (apenas atualiza valor, categoria, descrição)
   const { data: expense } = await supabase
     .from('expenses').select('installment_group_id').eq('id', id).single();
   if (!expense?.installment_group_id) return updateExpense(id, fields, 'single');
 
+  const { date: _keepOriginalDates, ...fieldsWithoutDate } = fields;
   const { error } = await supabase.from('expenses')
-    .update({ ...fields, updated_at: new Date().toISOString() })
+    .update({ ...fieldsWithoutDate, updated_at: new Date().toISOString() })
     .eq('installment_group_id', expense.installment_group_id)
     .eq('user_id', uid());
   return { error };
@@ -337,6 +340,41 @@ async function getCategoryBreakdown(year, month) {
   const count = data.length;
 
   const breakdown = Object.values(catMap)
+    .sort((a, b) => b.total - a.total)
+    .map(c => ({ ...c, percentage: total > 0 ? (c.total / total) * 100 : 0 }));
+
+  return { breakdown, total, count };
+}
+
+async function getSubcategoryBreakdown(year, month) {
+  const { start, end } = monthRange(year, month);
+  const { data } = await supabase
+    .from('expenses')
+    .select('amount, subcategory_id, subcategories(id, name), categories(id, name, emoji, color)')
+    .eq('user_id', uid())
+    .gte('date', start)
+    .lte('date', end);
+
+  if (!data || data.length === 0) return { breakdown: [], total: 0, count: 0 };
+
+  const subMap = {};
+  data.forEach(e => {
+    const hasSub = e.subcategory_id && e.subcategories?.name;
+    const key    = hasSub ? e.subcategory_id : `cat_${e.category_id || '_none'}`;
+    if (!subMap[key]) subMap[key] = {
+      id:    hasSub ? e.subcategories.id : null,
+      name:  hasSub ? e.subcategories.name : (e.categories?.name || 'Outros'),
+      color: e.categories?.color || '#6B7A92',
+      total: 0, count: 0,
+    };
+    subMap[key].total += parseFloat(e.amount);
+    subMap[key].count++;
+  });
+
+  const total = Object.values(subMap).reduce((s, c) => s + c.total, 0);
+  const count = data.length;
+
+  const breakdown = Object.values(subMap)
     .sort((a, b) => b.total - a.total)
     .map(c => ({ ...c, percentage: total > 0 ? (c.total / total) * 100 : 0 }));
 
