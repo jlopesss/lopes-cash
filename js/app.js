@@ -122,7 +122,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   syncPendingExpenses();
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => {
+        // Verifica atualização toda vez que o usuário volta ao app
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) reg.update();
+        });
+      })
+      .catch(() => {});
+
+    // Quando o novo SW assume o controle, recarrega para pegar os assets novos
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      location.reload();
+    });
   }
 });
 
