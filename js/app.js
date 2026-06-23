@@ -125,7 +125,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => {
-        // Verifica atualização toda vez que o usuário volta ao app
+        // Verifica atualização imediatamente ao abrir o app (não só no visibilitychange)
+        reg.update();
         document.addEventListener('visibilitychange', () => {
           if (!document.hidden) reg.update();
         });
@@ -133,7 +134,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       .catch(() => {});
 
     // Quando o novo SW assume o controle, recarrega para pegar os assets novos
+    let swReloading = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (swReloading) return;
+      swReloading = true;
       location.reload();
     });
   }
@@ -328,56 +332,44 @@ function initConfirmModal() {
 }
 
 // ── Pull to refresh ──────────────────────────────────────────
+// Totalmente passivo: não chama preventDefault, coexiste com o PTR nativo do Android.
+// Mostra indicador visual e recarrega quando o usuário puxa o suficiente.
 
 function initPullToRefresh() {
-  const indicator  = document.getElementById('pull-indicator');
-  const label      = document.getElementById('pull-label');
-  const THRESHOLD  = 72;
-  let startY       = 0;
-  let active       = false;
-  let dist         = 0;
-  let scrollTarget = null;
+  const indicator = document.getElementById('pull-indicator');
+  const label     = document.getElementById('pull-label');
+  const THRESHOLD = 80;
+  let startY = 0;
+  let active = false;
+  let dist   = 0;
 
-  // touchstart no document para capturar antes que o browser decida o gesto
   document.addEventListener('touchstart', e => {
     if (e.target.closest('.modal-overlay, .chips-scroll')) return;
     const view = e.target.closest('.view');
     if (!view || view.scrollTop > 2) return;
-    scrollTarget = view;
     startY = e.touches[0].clientY;
     active = true;
     dist   = 0;
     indicator.classList.remove('pull-releasing', 'pull-ready');
   }, { passive: true });
 
-  // passive: false no document — preventDefault ANTES do check de direção
-  // é essencial: se o primeiro touchmove não chamar preventDefault, o iOS
-  // trava o gesto como scroll e ignora chamadas posteriores.
   document.addEventListener('touchmove', e => {
-    if (!active || !scrollTarget) return;
-
-    if (scrollTarget.scrollTop > 2) {
-      active = false;
-      scrollTarget = null;
-      return;
-    }
-
-    // Previne o scroll/rubber-band nativo ANTES de calcular a direção
-    e.preventDefault();
+    if (!active) return;
+    const view = e.target.closest('.view');
+    if (!view || view.scrollTop > 2) { active = false; return; }
 
     dist = e.touches[0].clientY - startY;
     if (dist <= 0) return;
 
-    const travel = Math.min(dist * 0.5, 48);
+    const travel = Math.min(dist * 0.45, 44);
     indicator.style.transform = `translateX(-50%) translateY(${travel - 60}px)`;
     indicator.classList.toggle('pull-ready', dist >= THRESHOLD);
     label.textContent = dist >= THRESHOLD ? 'Soltar para atualizar' : 'Puxar para atualizar';
-  }, { passive: false });
+  }, { passive: true });
 
   document.addEventListener('touchend', () => {
     if (!active) return;
     active = false;
-    scrollTarget = null;
 
     if (dist >= THRESHOLD) {
       label.textContent = 'Atualizando…';
