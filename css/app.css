@@ -721,6 +721,9 @@
   font-weight: 700;
 }
 
+.picker-header-left { display: flex; align-items: center; gap: 8px; }
+
+.picker-back,
 .picker-close {
   width: 26px;
   height: 26px;
@@ -730,7 +733,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
+.picker-back:active { opacity: .7; }
 
 .picker-header-actions { display: flex; gap: 6px; align-items: center; }
 
@@ -1750,6 +1755,89 @@ body[data-view="orcamentos"] .fab {
   }
   .numpad-ok { border-radius: 0 0 24px 24px; }
 }
+
+/* ── Date Picker (calendário customizado) ── */
+.date-cal-sheet { max-width: 340px; padding-bottom: 4px; }
+
+.date-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 14px;
+}
+
+.date-cal-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.date-cal-nav-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--bg-card-soft);
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.date-cal-nav-btn:active { opacity: .7; }
+
+.date-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  padding-bottom: 6px;
+}
+
+.date-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  padding-bottom: 14px;
+}
+
+.date-cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.date-cal-day:active { background: var(--bg-card-soft); }
+.date-cal-day.date-cal-today { color: var(--primary-soft); font-weight: 700; }
+.date-cal-day.date-cal-selected { background: var(--primary); color: white; }
+.date-cal-day.date-cal-empty { visibility: hidden; }
+
+.date-cal-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 0 16px;
+}
+
+.date-cal-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.date-cal-cancel { color: var(--text-dim); background: var(--bg-app); }
+.date-cal-cancel:active { background: var(--bg-card-soft); }
+.date-cal-ok { color: white; background: var(--primary); }
+.date-cal-ok:active { opacity: .82; }
 
 /* ── Subcategorias no modal de categoria ── */
 .cat-subs-section {

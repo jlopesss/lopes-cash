@@ -588,7 +588,15 @@
     <div class="modal-sheet picker-sheet">
       <div class="modal-handle"></div>
       <div class="picker-header">
-        <span class="picker-title" id="picker-title">Categoria</span>
+        <div class="picker-header-left">
+          <button class="picker-back" id="picker-back" hidden aria-label="Voltar">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 2L3 7l6 5"/>
+            </svg>
+          </button>
+          <span class="picker-title" id="picker-title">Categoria</span>
+        </div>
         <div class="picker-header-actions">
           <button class="picker-add-cat-btn" id="picker-add-cat-btn" aria-label="Nova categoria">
             <svg width="11" height="11" viewBox="0 0 14 14" fill="none"
@@ -716,15 +724,15 @@
         <span class="numpad-value num" id="numpad-value">0</span>
       </div>
       <div class="numpad-grid">
-        <button class="numpad-btn" onclick="numpadPress('1')">1</button>
-        <button class="numpad-btn" onclick="numpadPress('2')">2</button>
-        <button class="numpad-btn" onclick="numpadPress('3')">3</button>
-        <button class="numpad-btn" onclick="numpadPress('4')">4</button>
-        <button class="numpad-btn" onclick="numpadPress('5')">5</button>
-        <button class="numpad-btn" onclick="numpadPress('6')">6</button>
         <button class="numpad-btn" onclick="numpadPress('7')">7</button>
         <button class="numpad-btn" onclick="numpadPress('8')">8</button>
         <button class="numpad-btn" onclick="numpadPress('9')">9</button>
+        <button class="numpad-btn" onclick="numpadPress('4')">4</button>
+        <button class="numpad-btn" onclick="numpadPress('5')">5</button>
+        <button class="numpad-btn" onclick="numpadPress('6')">6</button>
+        <button class="numpad-btn" onclick="numpadPress('1')">1</button>
+        <button class="numpad-btn" onclick="numpadPress('2')">2</button>
+        <button class="numpad-btn" onclick="numpadPress('3')">3</button>
         <button class="numpad-btn numpad-sym" onclick="numpadPress(',')">
           <span>,</span>
         </button>
@@ -738,6 +746,39 @@
         </button>
       </div>
       <button class="numpad-ok" onclick="numpadOk()">OK</button>
+    </div>
+  </div>
+
+
+  <!-- ── MODAL: DATA ──────────────────────────────────────── -->
+  <div id="date-picker-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet picker-sheet date-cal-sheet">
+      <div class="modal-handle"></div>
+      <div class="picker-header">
+        <span class="picker-title">Data</span>
+        <button class="picker-close" id="date-cal-close" aria-label="Fechar">
+          <svg width="10" height="10" viewBox="0 0 14 14" fill="none"
+               stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M2 2l10 10M12 2L2 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="date-cal-nav">
+        <button class="date-cal-nav-btn" id="date-cal-prev" aria-label="Mês anterior">‹</button>
+        <span class="date-cal-label" id="date-cal-label"></span>
+        <button class="date-cal-nav-btn" id="date-cal-next" aria-label="Próximo mês">›</button>
+      </div>
+
+      <div class="date-cal-weekdays">
+        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+      </div>
+      <div class="date-cal-grid" id="date-cal-grid"></div>
+
+      <div class="date-cal-actions">
+        <button class="date-cal-btn date-cal-cancel" id="date-cal-cancel">Cancelar</button>
+        <button class="date-cal-btn date-cal-ok" id="date-cal-ok">Ok</button>
+      </div>
     </div>
   </div>
 

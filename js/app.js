@@ -14,7 +14,7 @@ let _historySkipNext    = false;
 
 function _findTopmostModal() {
   const order = [
-    'numpad-modal', 'cat-edit-modal', 'cat-picker',
+    'numpad-modal', 'date-picker-modal', 'cat-edit-modal', 'cat-picker',
     'confirm-modal', 'budget-modal', 'name-edit-modal', 'expense-modal',
   ];
   for (const id of order) {
@@ -219,9 +219,19 @@ function initExpenseModal() {
   document.getElementById('subcat-btn').addEventListener('click', openSubcategoryPicker);
 
   // Date field
-  const dateInput = document.getElementById('expense-date');
-  document.getElementById('date-trigger').addEventListener('click', () => dateInput.showPicker?.() || dateInput.click());
-  dateInput.addEventListener('change', () => setDateField(dateInput.value));
+  document.getElementById('date-trigger').addEventListener('click', openDatePicker);
+  document.getElementById('date-picker-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeDatePicker();
+  });
+  document.getElementById('date-cal-close').addEventListener('click', closeDatePicker);
+  document.getElementById('date-cal-cancel').addEventListener('click', closeDatePicker);
+  document.getElementById('date-cal-ok').addEventListener('click', confirmCalDate);
+  document.getElementById('date-cal-prev').addEventListener('click', () => changeCalMonth(-1));
+  document.getElementById('date-cal-next').addEventListener('click', () => changeCalMonth(1));
+  document.getElementById('date-cal-grid').addEventListener('click', e => {
+    const btn = e.target.closest('[data-day]');
+    if (btn) selectCalDay(parseInt(btn.dataset.day, 10));
+  });
 
   // Installments
   document.getElementById('installment-check').addEventListener('change', e => toggleInstallments(e.target.checked));
@@ -248,6 +258,7 @@ function initExpenseModal() {
   document.getElementById('picker-add-cat-btn').addEventListener('click', () => {
     openCatEditModal(null);
   });
+  document.getElementById('picker-back').addEventListener('click', openCategoryPicker);
 }
 
 // ── Budget Modal wiring ───────────────────────────────────────

@@ -133,6 +133,65 @@ function setDateField(isoStr) {
   document.getElementById('badge-today').hidden = !isToday;
 }
 
+// ── Calendário customizado ───────────────────────────────────
+
+let _calYear, _calMonth, _calSelected;
+
+function openDatePicker() {
+  const current = document.getElementById('expense-date').value || todayISO();
+  _calSelected = current;
+  [_calYear, _calMonth] = current.split('-').map(Number);
+
+  renderCalendar();
+  document.getElementById('date-picker-modal').hidden = false;
+  _modalOpen();
+}
+
+function closeDatePicker() {
+  document.getElementById('date-picker-modal').hidden = true;
+  _modalClose();
+}
+
+function changeCalMonth(delta) {
+  _calMonth += delta;
+  if (_calMonth < 1)  { _calMonth = 12; _calYear--; }
+  if (_calMonth > 12) { _calMonth = 1;  _calYear++; }
+  renderCalendar();
+}
+
+function selectCalDay(day) {
+  _calSelected = isoDate(_calYear, _calMonth, day);
+  renderCalendar();
+}
+
+function confirmCalDate() {
+  setDateField(_calSelected);
+  closeDatePicker();
+}
+
+function renderCalendar() {
+  document.getElementById('date-cal-label').textContent =
+    `${monthName(_calMonth)} · ${_calYear}`;
+
+  const today      = todayISO();
+  const total      = daysInMonth(_calYear, _calMonth);
+  const firstDow   = new Date(_calYear, _calMonth - 1, 1).getDay();
+
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) {
+    cells.push('<span class="date-cal-day date-cal-empty"></span>');
+  }
+  for (let day = 1; day <= total; day++) {
+    const iso = isoDate(_calYear, _calMonth, day);
+    const cls = ['date-cal-day'];
+    if (iso === today) cls.push('date-cal-today');
+    if (iso === _calSelected) cls.push('date-cal-selected');
+    cells.push(`<button class="${cls.join(' ')}" data-day="${day}">${day}</button>`);
+  }
+
+  document.getElementById('date-cal-grid').innerHTML = cells.join('');
+}
+
 // ── Seleção de categoria ─────────────────────────────────────
 
 function openCategoryPicker() {
@@ -140,6 +199,8 @@ function openCategoryPicker() {
   const list    = document.getElementById('picker-list');
   const picker  = document.getElementById('cat-picker');
   const wasHidden = picker.hidden;
+
+  document.getElementById('picker-back').hidden = true;
 
   list.innerHTML = cats.map(cat => `
     <div class="picker-item-row">
@@ -178,10 +239,17 @@ function selectCategory(catId, catObj = null, closePicker = true) {
   valEl.classList.remove('placeholder');
 
   document.getElementById('subcat-value').textContent = '—';
-  const subcatBtn = document.getElementById('subcat-btn');
-  subcatBtn.disabled = !cat.subcategories || cat.subcategories.length === 0;
+  const hasSubcats = !!(cat.subcategories && cat.subcategories.length);
+  document.getElementById('subcat-btn').disabled = !hasSubcats;
 
-  if (closePicker) { document.getElementById('cat-picker').hidden = true; _modalClose(); }
+  if (closePicker) {
+    if (hasSubcats) {
+      openSubcategoryPicker();
+    } else {
+      document.getElementById('cat-picker').hidden = true;
+      _modalClose();
+    }
+  }
 }
 
 // ── Seleção de subcategoria ──────────────────────────────────
@@ -191,6 +259,9 @@ function openSubcategoryPicker() {
 
   const picker  = document.getElementById('cat-picker');
   const wasHidden = picker.hidden;
+
+  document.getElementById('picker-back').hidden = false;
+
   const list = document.getElementById('picker-list');
   list.innerHTML = _selectedCat.subcategories.map(sub => `
     <button class="picker-item" onclick="selectSubcategory('${sub.id}')">
