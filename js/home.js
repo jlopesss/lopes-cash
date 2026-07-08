@@ -41,8 +41,8 @@ function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent
   // Saldo grande
   const { integer, cents } = splitCurrency(balance);
   const isNeg = balance < 0;
-  document.getElementById('hero-amount').textContent = (isNeg ? '-' : '') + integer;
-  document.getElementById('hero-cents').textContent  = cents;
+  setHeroValue('hero-amount', (isNeg ? '-' : '') + integer);
+  setHeroValue('hero-cents', cents);
   document.getElementById('hero-amount').style.color  = isNeg ? 'var(--danger)' : 'var(--text-primary)';
   document.getElementById('hero-cents').style.color   = isNeg ? 'var(--danger)' : 'var(--text-dim)';
   document.querySelector('.hero-currency').style.color = isNeg ? 'var(--danger)' : 'var(--text-secondary)';
@@ -60,13 +60,12 @@ function renderHeroCard({ budget, spent, balance, daysLeft, totalDays, prevSpent
     `${daysLeft} dia${daysLeft !== 1 ? 's' : ''} restante${daysLeft !== 1 ? 's' : ''}`;
 
   // Grid 3 colunas
-  document.getElementById('budget-val').textContent = formatCurrency(budget);
-  const spentEl   = document.getElementById('spent-val');
-  spentEl.textContent   = formatCurrency(spent);
+  setHeroValue('budget-val', formatCurrency(budget));
+  setHeroValue('spent-val', formatCurrency(spent));
 
-  const saldoEl   = document.getElementById('saldo-val');
-  saldoEl.textContent   = (balance < 0 ? '-' : '') + formatCurrency(Math.abs(balance));
-  saldoEl.className     = 'hero-grid-val num ' + (balance < 0 ? 'danger' : 'success');
+  const saldoEl = document.getElementById('saldo-val');
+  setHeroValue('saldo-val', (balance < 0 ? '-' : '') + formatCurrency(Math.abs(balance)));
+  saldoEl.className = 'hero-grid-val num ' + (balance < 0 ? 'danger' : 'success');
 
   // Delta pill (só mostra se tem dado do mês anterior)
   const deltaPill = document.getElementById('delta-pill');
@@ -197,15 +196,55 @@ function initHome() {
 }
 
 // ── Ocultar/mostrar valores (olhinho) ───────────────────────────
-// Fica oculto por padrão sempre que o app é aberto (recarregado).
-// Uma vez que o usuário desoculta, permanece visível ao trocar de tela
-// dentro da mesma sessão (estado só volta a esconder num novo carregamento).
+// Fica oculto por padrão sempre que o app é aberto (nova sessão do navegador/PWA).
+// A escolha do usuário é guardada em sessionStorage: sobrevive a um F5, mas
+// some ao fechar e reabrir o app, quando volta a ficar oculto por padrão.
+
+const VALUES_HIDDEN_KEY = 'lc_values_hidden';
+const VALUE_MASKS = {
+  'hero-amount': '••••',
+  'hero-cents':  '',
+  'budget-val':  'R$ ••••',
+  'spent-val':   'R$ ••••',
+  'saldo-val':   'R$ ••••',
+};
+
+// Guarda os valores reais mais recentes, independente do estado de exibição,
+// para não precisar refazer o fetch quando o usuário reexibe os valores.
+let _heroRealValues = {};
+
+function _valuesHidden() {
+  const stored = sessionStorage.getItem(VALUES_HIDDEN_KEY);
+  return stored === null ? true : stored === '1';
+}
+
+// Atualiza o valor real de um campo e renderiza (mascarado ou não) na tela.
+function setHeroValue(id, text) {
+  _heroRealValues[id] = text;
+  renderHeroValueDisplay(id);
+}
+
+function renderHeroValueDisplay(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = _valuesHidden() ? VALUE_MASKS[id] : (_heroRealValues[id] ?? '');
+}
+
+function applyValueMask() {
+  Object.keys(VALUE_MASKS).forEach(renderHeroValueDisplay);
+}
 
 function initValueToggle() {
+  const hidden = _valuesHidden();
+  document.getElementById('eye-open-icon').hidden   = hidden;
+  document.getElementById('eye-closed-icon').hidden = !hidden;
+
   document.getElementById('toggle-values-btn').addEventListener('click', () => {
-    const hidden = document.getElementById('hero-card').classList.toggle('values-hidden');
-    document.getElementById('eye-open-icon').hidden   = hidden;
-    document.getElementById('eye-closed-icon').hidden = !hidden;
+    const newHidden = !_valuesHidden();
+    sessionStorage.setItem(VALUES_HIDDEN_KEY, newHidden ? '1' : '0');
+    applyValueMask();
+    document.getElementById('eye-open-icon').hidden   = newHidden;
+    document.getElementById('eye-closed-icon').hidden = !newHidden;
   });
 }
 

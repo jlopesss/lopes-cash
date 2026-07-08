@@ -87,16 +87,6 @@
 }
 .toggle-values-btn svg { width: 16px; height: 16px; }
 
-/* Ocultar valores sensíveis */
-.values-hidden .hero-amount,
-.values-hidden .hero-cents,
-.values-hidden #budget-val,
-.values-hidden #spent-val,
-.values-hidden #saldo-val {
-  filter: blur(7px);
-  user-select: none;
-}
-
 .hero-balance {
   display: flex;
   align-items: baseline;
