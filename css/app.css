@@ -70,6 +70,33 @@
   margin-bottom: 8px;
 }
 
+.hero-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hero-label-row .hero-label { margin-bottom: 8px; }
+
+.toggle-values-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  margin-top: -4px;
+  color: var(--text-dim);
+}
+.toggle-values-btn svg { width: 16px; height: 16px; }
+
+/* Ocultar valores sensíveis */
+.values-hidden .hero-amount,
+.values-hidden .hero-cents,
+.values-hidden #budget-val,
+.values-hidden #spent-val,
+.values-hidden #saldo-val {
+  filter: blur(7px);
+  user-select: none;
+}
+
 .hero-balance {
   display: flex;
   align-items: baseline;

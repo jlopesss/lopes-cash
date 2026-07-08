@@ -120,8 +120,22 @@
     </div>
 
     <!-- Hero Card -->
-    <div class="hero-card">
-      <div class="hero-label label">SALDO DO MÊS</div>
+    <div class="hero-card values-hidden" id="hero-card">
+      <div class="hero-label-row">
+        <div class="hero-label label">SALDO DO MÊS</div>
+        <button id="toggle-values-btn" class="toggle-values-btn" aria-label="Mostrar/ocultar valores">
+          <svg id="eye-open-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg id="eye-closed-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" hidden>
+            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.3 20.3 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a20.3 20.3 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+            <path d="M1 1l22 22"/>
+          </svg>
+        </button>
+      </div>
       <div class="hero-balance">
         <span class="hero-currency num">R$</span>
         <span class="hero-amount num" id="hero-amount">0</span>

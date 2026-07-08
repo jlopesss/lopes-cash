@@ -193,6 +193,20 @@ function initHome() {
     const item = e.target.closest('.expense-item[data-id]');
     if (item) openExpenseModal(item.dataset.id);
   });
+  initValueToggle();
+}
+
+// ── Ocultar/mostrar valores (olhinho) ───────────────────────────
+// Fica oculto por padrão sempre que o app é aberto (recarregado).
+// Uma vez que o usuário desoculta, permanece visível ao trocar de tela
+// dentro da mesma sessão (estado só volta a esconder num novo carregamento).
+
+function initValueToggle() {
+  document.getElementById('toggle-values-btn').addEventListener('click', () => {
+    const hidden = document.getElementById('hero-card').classList.toggle('values-hidden');
+    document.getElementById('eye-open-icon').hidden   = hidden;
+    document.getElementById('eye-closed-icon').hidden = !hidden;
+  });
 }
 
 function escHtml(str) {
