@@ -163,14 +163,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       })
       .catch(() => {});
-
-    // Quando o novo SW assume o controle, recarrega para pegar os assets novos
-    let swReloading = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (swReloading) return;
-      swReloading = true;
-      location.reload();
-    });
+    // O reload no controllerchange fica no topo do arquivo, fora daqui: este
+    // bloco só roda no fim do boot, e é justamente quando o boot quebra que
+    // precisamos dele para trazer a versão consistente de volta.
   }
 });
 
