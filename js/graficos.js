@@ -5,6 +5,10 @@ let _grafMonth = new Date().getMonth() + 1;
 
 const CIRC = 87.96; // 2π × 14 (donut r=14)
 
+// Tamanho do valor escrito na vertical dentro das barras do gráfico por mês.
+// A barra tem 14 de largura no viewBox, então o teto prático fica perto de 9.
+const BAR_LABEL_FS = 8;
+
 // ── Renderização principal ────────────────────────────────────
 
 async function renderGraficos() {
@@ -336,8 +340,10 @@ function renderBarChart(yearlyData) {
   const valueLabels = targets.map(t => {
     if (t.future || t.total <= 0) return '';
 
-    const txt    = compactBRL(t.total);
-    const needed = txt.length * 3.4 + 6; // altura aproximada do texto rotacionado
+    const txt = compactBRL(t.total);
+    // Rotacionado, o "comprimento" do texto vira altura: ~0.62 de avanço por
+    // caractere, mais uma folga. Se não couber na barra, o número sobe pra fora.
+    const needed = txt.length * BAR_LABEL_FS * 0.62 + 5;
     const inside = t.finalH >= needed;
     const cx     = t.x + barW / 2;
     const cy     = inside ? baselineY - 4 : t.finalY - 3;
@@ -346,7 +352,7 @@ function renderBarChart(yearlyData) {
       <text class="chart-bar-label" x="${cx}" y="${cy.toFixed(1)}"
         transform="rotate(-90 ${cx} ${cy.toFixed(1)})"
         text-anchor="start" dominant-baseline="middle"
-        font-size="5.5" font-weight="700"
+        font-size="${BAR_LABEL_FS}" font-weight="700"
         fill="${inside ? 'rgba(255,255,255,.95)' : '#8B9AB2'}"
         font-family="Space Grotesk, monospace">${txt}</text>`;
   }).join('');

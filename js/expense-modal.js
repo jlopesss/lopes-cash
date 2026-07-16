@@ -301,6 +301,13 @@ function openSubcategoryPicker() {
                    <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                  </svg>` : ''}
           </button>
+          <button class="picker-edit-btn" onclick="openSubcatEditModal('${sub.id}')"
+                  aria-label="Editar subcategoria">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z"/>
+            </svg>
+          </button>
         </div>
       `).join('');
 
@@ -319,49 +326,74 @@ function openSubcategoryPicker() {
   });
 }
 
-// ── Nova subcategoria (a partir do picker) ───────────────────
+// ── Nova / editar subcategoria (a partir do picker) ──────────
+// Mesmo modal para os dois casos, espelhando openCatEditModal:
+// null cria, um id renomeia.
 
-function openSubcatNewModal() {
+let _editSubId = null;
+
+function openSubcatEditModal(subId = null) {
   if (!_selectedCat) return;
-  document.getElementById('subcat-new-header').textContent =
-    `Nova subcategoria em ${_selectedCat.name}`;
-  document.getElementById('subcat-new-input').value = '';
-  document.getElementById('subcat-new-modal').hidden = false;
+  const sub = subId ? (_selectedCat.subcategories || []).find(s => s.id === subId) : null;
+  _editSubId = subId;
+
+  document.getElementById('subcat-edit-header').textContent =
+    sub ? 'Editar subcategoria' : `Nova subcategoria em ${_selectedCat.name}`;
+  document.getElementById('subcat-edit-input').value = sub?.name || '';
+  document.getElementById('subcat-edit-modal').hidden = false;
   _modalOpen();
-  setTimeout(() => document.getElementById('subcat-new-input').focus(), 80);
+  setTimeout(() => document.getElementById('subcat-edit-input').focus(), 80);
 }
 
-function closeSubcatNewModal() {
-  document.getElementById('subcat-new-modal').hidden = true;
+function closeSubcatEditModal() {
+  document.getElementById('subcat-edit-modal').hidden = true;
+  _editSubId = null;
   // O picker continua aberto atrás; não liberar o scroll do body ainda.
   if (document.getElementById('cat-picker').hidden) _modalClose();
 }
 
-async function saveSubcatNew() {
-  const input = document.getElementById('subcat-new-input');
-  const name  = input.value.trim();
+async function saveSubcatEdit() {
+  const name = document.getElementById('subcat-edit-input').value.trim();
   if (!name) { showToast('Informe o nome da subcategoria.'); return; }
   if (!_selectedCat) return;
 
-  const btn = document.getElementById('save-subcat-new-btn');
+  const btn = document.getElementById('save-subcat-edit-btn');
   btn.disabled = true;
-  const { data, error } = await insertSubcategory(_selectedCat.id, name);
-  btn.disabled = false;
 
-  if (error) { showToast('Erro ao criar: ' + error.message); return; }
-
-  // Mantém appState e a categoria selecionada em sincronia sem refazer o fetch.
-  const sub = { id: data.id, name };
-  _selectedCat.subcategories = _selectedCat.subcategories || [];
-  _selectedCat.subcategories.push(sub);
-
+  // A mesma categoria pode estar em dois objetos (o selecionado e o do
+  // appState); atualiza os dois para não precisar refazer o fetch.
   const stateCat = window.appState.categories.find(c => c.id === _selectedCat.id);
-  if (stateCat && stateCat !== _selectedCat) {
-    stateCat.subcategories = stateCat.subcategories || [];
-    stateCat.subcategories.push(sub);
+  const catsToSync = [_selectedCat, stateCat].filter((c, i, arr) => c && arr.indexOf(c) === i);
+
+  if (_editSubId) {
+    const { error } = await updateSubcategory(_editSubId, { name });
+    btn.disabled = false;
+    if (error) { showToast('Erro ao salvar: ' + error.message); return; }
+
+    catsToSync.forEach(c => {
+      const s = (c.subcategories || []).find(s => s.id === _editSubId);
+      if (s) s.name = name;
+    });
+    if (_selectedSubcat?.id === _editSubId) {
+      _selectedSubcat.name = name;
+      document.getElementById('subcat-value').textContent = name;
+    }
+    closeSubcatEditModal();
+    openSubcategoryPicker();
+    showToast('Subcategoria atualizada!', 'success');
+    return;
   }
 
-  closeSubcatNewModal();
+  const { data, error } = await insertSubcategory(_selectedCat.id, name);
+  btn.disabled = false;
+  if (error) { showToast('Erro ao criar: ' + error.message); return; }
+
+  catsToSync.forEach(c => {
+    c.subcategories = c.subcategories || [];
+    c.subcategories.push({ id: data.id, name });
+  });
+
+  closeSubcatEditModal();
   document.getElementById('subcat-btn').disabled = false;
   openSubcategoryPicker();
   showToast('Subcategoria criada!', 'success');

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lopes-cash-v26';
+const CACHE_NAME = 'lopes-cash-v27';
 const SHELL = [
   '/',
   '/index.html',

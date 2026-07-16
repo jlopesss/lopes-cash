@@ -256,18 +256,18 @@ function initExpenseModal() {
     _modalClose();
   });
   document.getElementById('picker-add-cat-btn').addEventListener('click', () => {
-    if (_pickerMode === 'sub') openSubcatNewModal();
+    if (_pickerMode === 'sub') openSubcatEditModal(null);
     else                      openCatEditModal(null);
   });
   document.getElementById('picker-back').addEventListener('click', openCategoryPicker);
 
-  const subcatNewModal = document.getElementById('subcat-new-modal');
-  subcatNewModal.addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeSubcatNewModal();
+  const subcatEditModal = document.getElementById('subcat-edit-modal');
+  subcatEditModal.addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeSubcatEditModal();
   });
-  document.getElementById('save-subcat-new-btn').addEventListener('click', saveSubcatNew);
-  document.getElementById('subcat-new-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); saveSubcatNew(); }
+  document.getElementById('save-subcat-edit-btn').addEventListener('click', saveSubcatEdit);
+  document.getElementById('subcat-edit-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveSubcatEdit(); }
   });
 }
 

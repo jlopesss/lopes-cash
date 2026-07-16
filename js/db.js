@@ -169,6 +169,14 @@ async function persistSubcategoryOrder(subs) {
   if (failed) throw failed.error;
 }
 
+async function updateSubcategory(id, fields) {
+  const { error } = await supabase
+    .from('subcategories')
+    .update(fields)
+    .eq('id', id).eq('user_id', uid());
+  return { error };
+}
+
 async function deleteSubcategory(id) {
   const { error } = await supabase
     .from('subcategories')
