@@ -8,6 +8,24 @@ function formatCurrency(value) {
   }).format(value || 0);
 }
 
+// Versão curta, sem "R$", para caber em espaços apertados (ex.: valor escrito
+// na vertical dentro das barras do gráfico). 2450 → "2,4k"; 980 → "980".
+function compactBRL(value) {
+  // Arredonda antes de comparar: 999,60 vira 1000, que deve sair como "1,0k".
+  const v = Math.round(Math.abs(value || 0));
+  if (v >= 1000) {
+    const k = v / 1000;
+    // Acima de 10k a casa decimal não cabe e agrega pouco: 12,3k → 12k.
+    // O teste usa o valor já arredondado, senão 9990 (k=9,99) cairia no ramo
+    // de uma casa e sairia como "10,0k".
+    const oneDecimal = Math.round(k * 10) / 10;
+    return (oneDecimal >= 10
+      ? Math.round(k).toString()
+      : oneDecimal.toFixed(1).replace('.', ',')) + 'k';
+  }
+  return v.toString();
+}
+
 // Retorna { integer: '1.234', cents: '56' } para exibição hero
 function splitCurrency(value) {
   const abs = Math.abs(value || 0);

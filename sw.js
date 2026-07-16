@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lopes-cash-v25';
+const CACHE_NAME = 'lopes-cash-v26';
 const SHELL = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const SHELL = [
   '/js/utils.js',
   '/js/db.js',
   '/js/offline-queue.js',
+  '/js/reorder.js',
   '/js/home.js',
   '/js/historico.js',
   '/js/perfil.js',

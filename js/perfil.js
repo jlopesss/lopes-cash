@@ -89,9 +89,15 @@ function _renderSubcatList(subs) {
     return;
   }
   list.innerHTML = subs.map(sub => `
-    <div class="cat-sub-item">
+    <div class="cat-sub-item" data-sub-id="${sub.id}">
+      <span class="drag-handle" data-drag-handle aria-label="Reordenar">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round">
+          <path d="M1 3h10M1 6h10M1 9h10"/>
+        </svg>
+      </span>
       <span class="cat-sub-name">${escHtml(sub.name)}</span>
-      <button class="cat-sub-delete-btn" data-sub-id="${sub.id}" aria-label="Remover">
+      <button class="cat-sub-delete-btn" data-sub-del="${sub.id}" aria-label="Remover">
         <svg width="7" height="7" viewBox="0 0 12 12" fill="none"
              stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
           <path d="M1 1l10 10M11 1L1 11"/>
@@ -99,6 +105,15 @@ function _renderSubcatList(subs) {
       </button>
     </div>
   `).join('');
+
+  initReorder(list, '[data-sub-id]', async orderedIds => {
+    const cat = window.appState.categories.find(c => c.id === _editCatId);
+    if (!cat) return;
+    cat.subcategories = orderedIds
+      .map(id => cat.subcategories.find(s => s.id === id))
+      .filter(Boolean);
+    await persistSubcategoryOrder(cat.subcategories);
+  });
 }
 
 async function addSubcat() {
@@ -191,7 +206,7 @@ function initCatEditModal() {
   document.getElementById('cat-subs-list').addEventListener('click', async e => {
     const btn = e.target.closest('.cat-sub-delete-btn');
     if (!btn) return;
-    const subId = btn.dataset.subId;
+    const subId = btn.dataset.subDel;
     const { error } = await deleteSubcategory(subId);
     if (error) { showToast('Erro ao remover subcategoria.'); return; }
     const cat = window.appState.categories.find(c => c.id === _editCatId);
@@ -227,21 +242,23 @@ async function renderOrcamentos() {
   const currentMon  = now.getMonth() + 1;
 
   const html = Array.from({ length: 12 }, (_, i) => {
-    const m          = i + 1;
-    const isCurrent  = m === currentMon && _orcYear === currentYear;
-    const hasOverride = overrideMap[m] !== undefined;
-    const amount     = hasOverride ? overrideMap[m] : defAmount;
+    const m         = i + 1;
+    const isCurrent = m === currentMon && _orcYear === currentYear;
+    const amount    = overrideMap[m] !== undefined ? overrideMap[m] : defAmount;
+    // O mês só é "personalizado" quando o valor difere do padrão. Ter linha em
+    // monthly_budgets não basta: salvar o mesmo valor do padrão não personaliza nada.
+    const isCustom  = overrideMap[m] !== undefined && overrideMap[m] !== defAmount;
 
     return `
       <button class="orc-month-item ${isCurrent ? 'orc-month-current' : ''}"
               data-orc-month="${m}">
         <div class="orc-month-left">
           <span class="orc-month-name">${monthName(m, false)}</span>
-          ${isCurrent  ? '<span class="badge-atual">ATUAL</span>'     : ''}
-          ${!hasOverride && !isCurrent ? '<span class="badge-default">padrão</span>' : ''}
+          ${isCurrent ? '<span class="badge-atual">ATUAL</span>' : ''}
+          ${!isCustom && !isCurrent ? '<span class="badge-default">padrão</span>' : ''}
         </div>
         <div class="orc-month-right">
-          ${hasOverride ? '<span class="badge-override">+override</span>' : ''}
+          ${isCustom ? '<span class="badge-custom">personalizado</span>' : ''}
           <span class="orc-month-val num">${formatCurrency(amount)}</span>
           <svg width="7" height="12" viewBox="0 0 7 12" fill="none"
                stroke="var(--text-dim)" stroke-width="1.5" stroke-linecap="round">

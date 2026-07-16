@@ -18,7 +18,7 @@ async function renderHome() {
   const [budgetData, spent, lastExpenses, daily, prevSpent] = await Promise.all([
     getBudgetForMonth(year, month),
     getMonthTotal(year, month),
-    getLastExpenses(5),
+    getLastExpenses(10),
     getDailyCumulative(year, month),
     getMonthTotal(prev.year, prev.month),
   ]);

@@ -6,6 +6,9 @@ let _installments    = 1;
 let _editId          = null;
 let _numpadRaw       = '';
 let _numpadOpenTimer = null;
+// 'cat' | 'sub' — o mesmo #cat-picker serve as duas listas; o botão "Nova" precisa
+// saber qual delas está na tela para criar a coisa certa.
+let _pickerMode      = 'cat';
 
 // ── Abrir / Fechar ───────────────────────────────────────────
 
@@ -203,7 +206,13 @@ function openCategoryPicker() {
   document.getElementById('picker-back').hidden = true;
 
   list.innerHTML = cats.map(cat => `
-    <div class="picker-item-row">
+    <div class="picker-item-row" data-cat-row="${cat.id}">
+      <span class="drag-handle" data-drag-handle aria-label="Reordenar">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round">
+          <path d="M1 3h10M1 6h10M1 9h10"/>
+        </svg>
+      </span>
       <button class="picker-item" data-cat-id="${cat.id}" onclick="selectCategory('${cat.id}')">
         <span class="picker-item-emoji">${cat.emoji}</span>
         <span class="picker-item-name">${escHtml(cat.name)}</span>
@@ -221,10 +230,19 @@ function openCategoryPicker() {
     </div>
   `).join('');
 
+  _pickerMode = 'cat';
   document.getElementById('picker-title').textContent = 'Categoria';
   document.getElementById('picker-add-cat-btn').hidden = false;
+  document.getElementById('picker-add-cat-btn').setAttribute('aria-label', 'Nova categoria');
   picker.hidden = false;
   if (wasHidden) _modalOpen();
+
+  initReorder(list, '[data-cat-row]', async orderedIds => {
+    window.appState.categories = orderedIds
+      .map(id => cats.find(c => c.id === id))
+      .filter(Boolean);
+    await persistCategoryOrder(window.appState.categories);
+  });
 }
 
 function selectCategory(catId, catObj = null, closePicker = true) {
@@ -240,7 +258,8 @@ function selectCategory(catId, catObj = null, closePicker = true) {
 
   document.getElementById('subcat-value').textContent = '—';
   const hasSubcats = !!(cat.subcategories && cat.subcategories.length);
-  document.getElementById('subcat-btn').disabled = !hasSubcats;
+  // Sempre habilitado: mesmo sem subcategorias, o picker permite criar a primeira.
+  document.getElementById('subcat-btn').disabled = false;
 
   if (closePicker) {
     if (hasSubcats) {
@@ -255,28 +274,97 @@ function selectCategory(catId, catObj = null, closePicker = true) {
 // ── Seleção de subcategoria ──────────────────────────────────
 
 function openSubcategoryPicker() {
-  if (!_selectedCat || !_selectedCat.subcategories?.length) return;
+  if (!_selectedCat) return;
 
   const picker  = document.getElementById('cat-picker');
   const wasHidden = picker.hidden;
 
   document.getElementById('picker-back').hidden = false;
 
+  const subs = _selectedCat.subcategories || [];
   const list = document.getElementById('picker-list');
-  list.innerHTML = _selectedCat.subcategories.map(sub => `
-    <button class="picker-item" onclick="selectSubcategory('${sub.id}')">
-      <span class="picker-item-name">${escHtml(sub.name)}</span>
-      ${_selectedSubcat?.id === sub.id
-        ? `<svg class="picker-item-check" viewBox="0 0 16 16" fill="none">
-             <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-           </svg>` : ''}
-    </button>
-  `).join('');
 
+  list.innerHTML = subs.length === 0
+    ? '<div class="picker-empty">Nenhuma subcategoria ainda.<br>Toque em “Nova” para criar.</div>'
+    : subs.map(sub => `
+        <div class="picker-item-row" data-sub-id="${sub.id}">
+          <span class="drag-handle" data-drag-handle aria-label="Reordenar">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round">
+              <path d="M1 3h10M1 6h10M1 9h10"/>
+            </svg>
+          </span>
+          <button class="picker-item" onclick="selectSubcategory('${sub.id}')">
+            <span class="picker-item-name">${escHtml(sub.name)}</span>
+            ${_selectedSubcat?.id === sub.id
+              ? `<svg class="picker-item-check" viewBox="0 0 16 16" fill="none">
+                   <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                 </svg>` : ''}
+          </button>
+        </div>
+      `).join('');
+
+  _pickerMode = 'sub';
   document.getElementById('picker-title').textContent = 'Subcategoria';
-  document.getElementById('picker-add-cat-btn').hidden = true;
+  document.getElementById('picker-add-cat-btn').hidden = false;
+  document.getElementById('picker-add-cat-btn').setAttribute('aria-label', 'Nova subcategoria');
   picker.hidden = false;
   if (wasHidden) _modalOpen();
+
+  initReorder(list, '[data-sub-id]', async orderedIds => {
+    _selectedCat.subcategories = orderedIds
+      .map(id => subs.find(s => s.id === id))
+      .filter(Boolean);
+    await persistSubcategoryOrder(_selectedCat.subcategories);
+  });
+}
+
+// ── Nova subcategoria (a partir do picker) ───────────────────
+
+function openSubcatNewModal() {
+  if (!_selectedCat) return;
+  document.getElementById('subcat-new-header').textContent =
+    `Nova subcategoria em ${_selectedCat.name}`;
+  document.getElementById('subcat-new-input').value = '';
+  document.getElementById('subcat-new-modal').hidden = false;
+  _modalOpen();
+  setTimeout(() => document.getElementById('subcat-new-input').focus(), 80);
+}
+
+function closeSubcatNewModal() {
+  document.getElementById('subcat-new-modal').hidden = true;
+  // O picker continua aberto atrás; não liberar o scroll do body ainda.
+  if (document.getElementById('cat-picker').hidden) _modalClose();
+}
+
+async function saveSubcatNew() {
+  const input = document.getElementById('subcat-new-input');
+  const name  = input.value.trim();
+  if (!name) { showToast('Informe o nome da subcategoria.'); return; }
+  if (!_selectedCat) return;
+
+  const btn = document.getElementById('save-subcat-new-btn');
+  btn.disabled = true;
+  const { data, error } = await insertSubcategory(_selectedCat.id, name);
+  btn.disabled = false;
+
+  if (error) { showToast('Erro ao criar: ' + error.message); return; }
+
+  // Mantém appState e a categoria selecionada em sincronia sem refazer o fetch.
+  const sub = { id: data.id, name };
+  _selectedCat.subcategories = _selectedCat.subcategories || [];
+  _selectedCat.subcategories.push(sub);
+
+  const stateCat = window.appState.categories.find(c => c.id === _selectedCat.id);
+  if (stateCat && stateCat !== _selectedCat) {
+    stateCat.subcategories = stateCat.subcategories || [];
+    stateCat.subcategories.push(sub);
+  }
+
+  closeSubcatNewModal();
+  document.getElementById('subcat-btn').disabled = false;
+  openSubcategoryPicker();
+  showToast('Subcategoria criada!', 'success');
 }
 
 function selectSubcategory(subId, subObj = null) {

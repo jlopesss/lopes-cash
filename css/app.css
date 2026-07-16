@@ -808,6 +808,46 @@
   color: var(--primary);
 }
 
+/* ── Reordenar arrastando ── */
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  align-self: stretch;
+  color: var(--text-dimmest);
+  cursor: grab;
+  /* Impede o scroll da lista de roubar o gesto vertical do arrasto. */
+  touch-action: none;
+}
+.drag-handle:active { cursor: grabbing; color: var(--primary); }
+
+.picker-item-row.dragging,
+.cat-sub-item.dragging {
+  position: relative;
+  z-index: 2;
+  opacity: .95;
+  box-shadow: 0 8px 24px rgba(0,0,0,.45);
+  border-color: rgba(91,140,255,.4);
+}
+
+/* Durante o arrasto, nada de seleção de texto nem realce de toque. */
+body.reordering {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.picker-empty {
+  padding: 20px 12px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-dimmest);
+}
+
 .picker-item {
   display: flex;
   align-items: center;
@@ -1004,15 +1044,15 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   z-index: 19;
 }
 
-/* FAB sobe quando o footer do histórico está visível */
+/* FAB sobe quando o footer do histórico está visível.
+   O card mede ~97px e começa em bottom:80px, então o topo dele fica em 177px. */
 body.hist-active .fab {
-  bottom: 158px;
+  bottom: 189px;
 }
 
 /* FAB só aparece na home e no histórico */
@@ -1022,7 +1062,16 @@ body[data-view="orcamentos"] .fab {
   display: none;
 }
 
-.hist-footer-left {}
+.hist-footer-totals {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hist-footer-col-right {
+  text-align: right;
+}
 
 .hist-footer-val {
   font-size: 20px;
@@ -1043,7 +1092,7 @@ body[data-view="orcamentos"] .fab {
 }
 
 .hist-footer-bar-track {
-  width: 70px;
+  width: 100%;
   height: 4px;
   background: var(--bg-card-soft);
   border-radius: 2px;
@@ -1298,13 +1347,14 @@ body[data-view="orcamentos"] .fab {
   border-radius: 6px;
 }
 
-.badge-override {
+.badge-custom {
   font-size: 8px;
   font-weight: 700;
   color: var(--accent-purple-soft);
   background: rgba(139,92,246,.15);
   padding: 1px 5px;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
 /* ── Modal de confirmação (parcelas) ── */
@@ -1549,6 +1599,13 @@ body[data-view="orcamentos"] .fab {
   height: auto;
   display: block;
 }
+
+/* Valor do mês escrito na vertical; entra depois que a barra termina de crescer. */
+.chart-bar-label {
+  opacity: 0;
+  transition: opacity .25s ease-out;
+}
+.chart-bar-label.visible { opacity: 1; }
 
 .bar-footer {
   display: flex;
@@ -1864,9 +1921,10 @@ body[data-view="orcamentos"] .fab {
 }
 
 /* Chips que fluem em linha */
+/* Lista vertical (não chips em wrap): o reordenar é um arrasto para cima/baixo. */
 .cat-subs-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
   margin-bottom: 10px;
   min-height: 24px;
@@ -1880,20 +1938,23 @@ body[data-view="orcamentos"] .fab {
 }
 
 .cat-sub-item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 6px 5px 10px;
+  padding: 7px 8px 7px 6px;
   background: var(--bg-card-soft);
-  border-radius: var(--radius-chip);
+  border-radius: 10px;
   border: 1px solid rgba(255,255,255,.06);
 }
 
 .cat-sub-name {
+  flex: 1;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Bolinha × dentro do chip */

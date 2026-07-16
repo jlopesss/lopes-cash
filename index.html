@@ -244,17 +244,23 @@
     <!-- Lista agrupada -->
     <div id="hist-expenses-list" class="hist-list-container"></div>
 
-    <!-- Footer Saldo -->
+    <!-- Footer Gasto + Saldo -->
     <div class="hist-footer-card" id="hist-footer" hidden>
-      <div class="hist-footer-left">
-        <div class="label-sm" id="hist-footer-label">SALDO</div>
-        <div class="hist-footer-val num" id="hist-footer-val">R$ 0</div>
+      <div class="hist-footer-totals">
+        <div class="hist-footer-col">
+          <div class="label-sm" id="hist-footer-spent-label">GASTO</div>
+          <div class="hist-footer-val num" id="hist-footer-spent-val">R$ 0</div>
+        </div>
+        <div class="hist-footer-col hist-footer-col-right">
+          <div class="label-sm" id="hist-footer-label">SALDO</div>
+          <div class="hist-footer-val num" id="hist-footer-val">R$ 0</div>
+        </div>
       </div>
       <div class="hist-footer-right">
-        <div class="hist-footer-pct" id="hist-footer-pct">—</div>
         <div class="hist-footer-bar-track">
           <div class="hist-footer-bar" id="hist-footer-bar"></div>
         </div>
+        <div class="hist-footer-pct" id="hist-footer-pct">—</div>
       </div>
     </div>
 
@@ -673,6 +679,19 @@
   </div>
 
 
+  <!-- ── MODAL: NOVA SUBCATEGORIA ─────────────────────────── -->
+  <div id="subcat-new-modal" class="modal-overlay" hidden>
+    <div class="modal-sheet budget-sheet">
+      <div class="budget-modal-header" id="subcat-new-header">Nova subcategoria</div>
+      <div class="budget-input-row" style="margin-bottom:16px">
+        <input type="text" id="subcat-new-input" class="budget-modal-input"
+               placeholder="Ex: Padaria" maxlength="30" autocomplete="off">
+      </div>
+      <button id="save-subcat-new-btn" class="btn-primary">Salvar</button>
+    </div>
+  </div>
+
+
   <!-- ── MODAL: EDITAR CATEGORIA ───────────────────────────── -->
   <div id="cat-edit-modal" class="modal-overlay" hidden>
     <div class="modal-sheet cat-edit-sheet">
@@ -807,6 +826,7 @@
 <script src="js/utils.js"></script>
 <script src="js/db.js"></script>
 <script src="js/offline-queue.js"></script>
+<script src="js/reorder.js"></script>
 <script src="js/home.js"></script>
 <script src="js/historico.js"></script>
 <script src="js/perfil.js"></script>

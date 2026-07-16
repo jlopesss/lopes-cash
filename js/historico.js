@@ -210,9 +210,14 @@ function renderHistFooter(expenses, budgetData) {
   const barPct   = clamp(spentPct, 0, 100);
 
   footer.hidden = false;
-  document.getElementById('hist-footer-label').textContent =
-    `SALDO · ${monthName(_histMonth, true).toUpperCase()}`;
-  document.getElementById('hist-footer-val').textContent = formatCurrency(Math.abs(saldo));
+  const mesLabel = monthName(_histMonth, true).toUpperCase();
+
+  document.getElementById('hist-footer-spent-label').textContent = `GASTO · ${mesLabel}`;
+  document.getElementById('hist-footer-spent-val').textContent   = formatCurrency(total);
+
+  document.getElementById('hist-footer-label').textContent = `SALDO · ${mesLabel}`;
+  document.getElementById('hist-footer-val').textContent =
+    (isPos ? '' : '-') + formatCurrency(Math.abs(saldo));
   document.getElementById('hist-footer-val').style.color = isPos ? 'var(--primary-soft)' : 'var(--danger)';
   document.getElementById('hist-footer-pct').textContent =
     budget > 0 ? `${spentPct.toFixed(0)}% do orçamento` : '—';

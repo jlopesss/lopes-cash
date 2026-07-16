@@ -45,7 +45,11 @@ function openGrafMonthPicker() {
              </svg>` : ''}
       </button>`;
   }).join('');
-  document.getElementById('picker-title').textContent = 'Selecionar mês';
+  // Este picker é o mesmo #cat-picker das categorias: esconde os controles que
+  // só fazem sentido lá, senão "Nova" criaria uma categoria a partir daqui.
+  document.getElementById('picker-title').textContent   = 'Selecionar mês';
+  document.getElementById('picker-add-cat-btn').hidden  = true;
+  document.getElementById('picker-back').hidden         = true;
   document.getElementById('cat-picker').hidden = false;
   _modalOpen();
 
@@ -225,7 +229,6 @@ function renderBarChart(yearlyData) {
   const W = 260, H = 105;
   const baselineY  = 82;   // y do chão das barras
   const maxBarH    = 68;   // altura máxima de barra
-  const budgetLineY = baselineY - maxBarH; // y da linha de orçamento
   const labelY     = 97;   // y dos labels de mês
 
   const barW  = 14;
@@ -237,9 +240,11 @@ function renderBarChart(yearlyData) {
   const currentMonth = now.getMonth() + 1;
   const prevMon      = _grafYear === currentYear ? currentMonth - 1 : 0;
 
-  // Acha o budget de referência para a linha horizontal
-  const avgBudget = yearlyData.reduce((s, m) => s + m.budget, 0) / 12 || 0;
-  const maxRef    = avgBudget > 0 ? avgBudget : Math.max(...yearlyData.map(m => m.total), 1);
+  // A escala precisa acomodar o maior gasto E a maior meta do ano, senão a
+  // linha da meta (que agora varia mês a mês) sairia do topo do gráfico.
+  const maxTotal  = Math.max(...yearlyData.map(m => m.total));
+  const maxBudget = Math.max(...yearlyData.map(m => m.budget));
+  const maxRef    = Math.max(maxTotal, maxBudget, 1);
 
   // Cor de cada barra
   function barColor(month) {
@@ -253,15 +258,16 @@ function renderBarChart(yearlyData) {
 
   // Calcula alvos para animação
   const targets = yearlyData.map((m, i) => {
-    const ratio    = maxRef > 0 ? Math.min(m.total / maxRef, 1.15) : 0;
-    const barH     = m.total > 0 ? Math.max(ratio * maxBarH, 3) : 3;
-    const future   = _grafYear === currentYear && m.month > currentMonth;
+    const barH   = m.total > 0 ? Math.max((m.total / maxRef) * maxBarH, 3) : 3;
+    const future = _grafYear === currentYear && m.month > currentMonth;
     return {
-      x:     startX + i * step,
+      x:      startX + i * step,
       finalH: future ? 3 : barH,
       finalY: future ? baselineY - 3 : baselineY - barH,
       color:  barColor(m.month),
       month:  m.month,
+      total:  m.total,
+      future,
     };
   });
 
@@ -290,20 +296,60 @@ function renderBarChart(yearlyData) {
   document.getElementById('bar-total').textContent = formatCurrency(yearlytotal);
 
   // Monta SVG (barras com h=0 para animação)
-  const budgetLabel = avgBudget >= 1000
-    ? (avgBudget / 1000).toFixed(1).replace('.', ',') + 'k'
-    : formatCurrency(avgBudget).replace('R$ ', '');
+  // ── Linha da meta: um patamar por mês, com degraus quando muda ──
+  // A meta de março vale março inteiro; ligar os meses por diagonal sugeriria
+  // uma meta que muda no meio do mês, o que não existe.
+  const yOfBudget = b => baselineY - (b / maxRef) * maxBarH;
+  const cellLeft  = i => startX + i * step - (step - barW) / 2;
 
-  const budgetLine = avgBudget > 0 ? `
-    <line x1="${startX}" y1="${budgetLineY}" x2="${startX + 11 * step + barW}" y2="${budgetLineY}"
-      stroke="#39E0A0" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6"/>
-    <text x="${startX + 11 * step + barW + 3}" y="${budgetLineY + 3}"
-      font-size="6" fill="#39E0A0" font-family="Space Grotesk">${budgetLabel}</text>` : '';
+  let budgetLine = '';
+  if (maxBudget > 0) {
+    const segs = yearlyData.map((m, i) => ({
+      y:  yOfBudget(m.budget),
+      x1: cellLeft(i),
+      x2: cellLeft(i) + step,
+    }));
+
+    let d = `M${segs[0].x1.toFixed(1)},${segs[0].y.toFixed(1)}`;
+    segs.forEach((s, i) => {
+      if (i > 0 && s.y !== segs[i - 1].y) d += ` V${s.y.toFixed(1)}`;
+      d += ` H${s.x2.toFixed(1)}`;
+    });
+
+    const lastSeg = segs[segs.length - 1];
+    budgetLine = `
+      <path d="${d}" fill="none" stroke="#39E0A0" stroke-width="0.8"
+        stroke-dasharray="3 3" opacity="0.6" stroke-linejoin="round"/>
+      <text x="${(lastSeg.x2 + 2).toFixed(1)}" y="${(lastSeg.y + 2).toFixed(1)}"
+        font-size="5.5" fill="#39E0A0" opacity="0.85"
+        font-family="Manrope, sans-serif">meta</text>`;
+  }
 
   const bars = targets.map((t, i) => `
     <rect class="chart-bar" x="${t.x}" y="${baselineY}" width="${barW}" height="0"
       rx="3" fill="${t.color}" data-i="${i}"/>
   `).join('');
+
+  // ── Valor de cada mês, escrito na vertical ──
+  // Cabe dentro da barra quando ela é alta o bastante; nas barras curtas o
+  // número invadiria a área abaixo da linha de base, então sobe para fora.
+  const valueLabels = targets.map(t => {
+    if (t.future || t.total <= 0) return '';
+
+    const txt    = compactBRL(t.total);
+    const needed = txt.length * 3.4 + 6; // altura aproximada do texto rotacionado
+    const inside = t.finalH >= needed;
+    const cx     = t.x + barW / 2;
+    const cy     = inside ? baselineY - 4 : t.finalY - 3;
+
+    return `
+      <text class="chart-bar-label" x="${cx}" y="${cy.toFixed(1)}"
+        transform="rotate(-90 ${cx} ${cy.toFixed(1)})"
+        text-anchor="start" dominant-baseline="middle"
+        font-size="5.5" font-weight="700"
+        fill="${inside ? 'rgba(255,255,255,.95)' : '#8B9AB2'}"
+        font-family="Space Grotesk, monospace">${txt}</text>`;
+  }).join('');
 
   const labels = targets.map((t, i) => {
     const isCurrentM = _grafYear === currentYear && t.month === currentMonth;
@@ -316,7 +362,7 @@ function renderBarChart(yearlyData) {
     </text>`;
   }).join('');
 
-  svg.innerHTML = budgetLine + bars + labels;
+  svg.innerHTML = budgetLine + bars + valueLabels + labels;
 
   // Anima barras de baixo pra cima com stagger
   const barEls = svg.querySelectorAll('.chart-bar');
@@ -341,6 +387,9 @@ function renderBarChart(yearlyData) {
         if (prog < 1) allDone = false;
       });
       if (!allDone) requestAnimationFrame(tick);
+      // Os valores só entram quando as barras já cresceram, senão ficariam
+      // flutuando sobre o fundo durante a animação.
+      else svg.querySelectorAll('.chart-bar-label').forEach(el => el.classList.add('visible'));
     }
     requestAnimationFrame(tick);
   }

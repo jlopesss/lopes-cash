@@ -102,7 +102,8 @@ async function getCategories() {
     .from('categories')
     .select('*, subcategories(*)')
     .eq('user_id', uid())
-    .order('position');
+    .order('position')
+    .order('position', { referencedTable: 'subcategories' });
   return data || [];
 }
 
@@ -141,6 +142,31 @@ async function insertSubcategory(categoryId, name) {
     .insert({ category_id: categoryId, user_id: uid(), name, position: existing?.length || 0 })
     .select('id').single();
   return { data, error };
+}
+
+// Grava a ordem de exibição. Recebe os itens já na ordem desejada e escreve
+// `position` = índice. Um update por linha: são poucas dezenas de itens e o
+// upsert exigiria reenviar todas as colunas obrigatórias.
+async function persistCategoryOrder(cats) {
+  const results = await Promise.all(
+    cats.map((c, i) =>
+      supabase.from('categories').update({ position: i })
+        .eq('id', c.id).eq('user_id', uid())
+    )
+  );
+  const failed = results.find(r => r.error);
+  if (failed) throw failed.error;
+}
+
+async function persistSubcategoryOrder(subs) {
+  const results = await Promise.all(
+    subs.map((s, i) =>
+      supabase.from('subcategories').update({ position: i })
+        .eq('id', s.id).eq('user_id', uid())
+    )
+  );
+  const failed = results.find(r => r.error);
+  if (failed) throw failed.error;
 }
 
 async function deleteSubcategory(id) {

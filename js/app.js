@@ -256,9 +256,19 @@ function initExpenseModal() {
     _modalClose();
   });
   document.getElementById('picker-add-cat-btn').addEventListener('click', () => {
-    openCatEditModal(null);
+    if (_pickerMode === 'sub') openSubcatNewModal();
+    else                      openCatEditModal(null);
   });
   document.getElementById('picker-back').addEventListener('click', openCategoryPicker);
+
+  const subcatNewModal = document.getElementById('subcat-new-modal');
+  subcatNewModal.addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeSubcatNewModal();
+  });
+  document.getElementById('save-subcat-new-btn').addEventListener('click', saveSubcatNew);
+  document.getElementById('subcat-new-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveSubcatNew(); }
+  });
 }
 
 // ── Budget Modal wiring ───────────────────────────────────────
