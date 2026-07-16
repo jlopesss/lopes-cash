@@ -13,9 +13,14 @@ let _modalSessionActive = false;
 let _historySkipNext    = false;
 
 function _findTopmostModal() {
+  // Ordem = prioridade do "voltar": o primeiro visível é tratado como o do topo,
+  // então precisa espelhar o empilhamento real na tela. O confirm é aberto a
+  // partir dos modais de edição e fica acima deles (z-index 110), por isso vem
+  // primeiro; subcat-edit abre sobre o cat-picker, por isso vem antes dele.
   const order = [
-    'numpad-modal', 'date-picker-modal', 'cat-edit-modal', 'cat-picker',
-    'confirm-modal', 'budget-modal', 'name-edit-modal', 'expense-modal',
+    'confirm-modal', 'numpad-modal', 'date-picker-modal', 'cat-edit-modal',
+    'subcat-edit-modal', 'cat-picker', 'budget-modal', 'name-edit-modal',
+    'expense-modal',
   ];
   for (const id of order) {
     const el = document.getElementById(id);
@@ -266,6 +271,7 @@ function initExpenseModal() {
     if (e.target === e.currentTarget) closeSubcatEditModal();
   });
   document.getElementById('save-subcat-edit-btn').addEventListener('click', saveSubcatEdit);
+  document.getElementById('subcat-edit-delete-btn').addEventListener('click', deleteSubcatEdit);
   document.getElementById('subcat-edit-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveSubcatEdit(); }
   });

@@ -340,9 +340,43 @@ function openSubcatEditModal(subId = null) {
   document.getElementById('subcat-edit-header').textContent =
     sub ? 'Editar subcategoria' : `Nova subcategoria em ${_selectedCat.name}`;
   document.getElementById('subcat-edit-input').value = sub?.name || '';
+  document.getElementById('subcat-edit-delete-btn').hidden = !sub;
   document.getElementById('subcat-edit-modal').hidden = false;
   _modalOpen();
   setTimeout(() => document.getElementById('subcat-edit-input').focus(), 80);
+}
+
+async function deleteSubcatEdit() {
+  if (!_editSubId || !_selectedCat) return;
+  const subId = _editSubId;
+  const sub   = (_selectedCat.subcategories || []).find(s => s.id === subId);
+
+  showConfirm(
+    `Excluir "${sub?.name || 'esta subcategoria'}"?`,
+    'Sim, excluir',
+    null,
+    async () => {
+      if (!await deleteSubcategoryGuarded(subId)) return;
+
+      const stateCat = window.appState.categories.find(c => c.id === _selectedCat.id);
+      [_selectedCat, stateCat]
+        .filter((c, i, arr) => c && arr.indexOf(c) === i)
+        .forEach(c => {
+          c.subcategories = (c.subcategories || []).filter(s => s.id !== subId);
+        });
+
+      // O gasto em edição pode estar apontando para a subcategoria excluída.
+      if (_selectedSubcat?.id === subId) {
+        _selectedSubcat = null;
+        document.getElementById('subcat-value').textContent = '—';
+      }
+
+      closeSubcatEditModal();
+      openSubcategoryPicker();
+      showToast('Subcategoria excluída.', 'success');
+    },
+    null
+  );
 }
 
 function closeSubcatEditModal() {

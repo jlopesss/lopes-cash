@@ -167,16 +167,31 @@ async function saveCatEdit() {
 }
 
 async function deleteCatEdit() {
-  if (!confirm('Excluir esta categoria? Gastos vinculados ficam sem categoria.')) return;
+  const cat = window.appState.categories.find(c => c.id === _editCatId);
 
-  const { error } = await deleteCategory(_editCatId);
-  if (error) {
-    showToast('Não foi possível excluir.');
+  // Categoria com gastos não pode ser excluída: expenses.category_id não tem
+  // `on delete`, então o banco recusaria de qualquer forma — mas com um erro
+  // de FK ilegível. Checar antes permite dizer o porquê.
+  const { count, error: countErr } = await countExpensesByCategory(_editCatId);
+  if (countErr) { showToast('Não foi possível verificar os gastos.'); return; }
+  if (count > 0) {
+    showToast(`Não dá para excluir: ${count} gasto${count > 1 ? 's' : ''} nesta categoria.`);
     return;
   }
-  window.appState.categories = await getCategories();
-  closeCatEditModal();
-  showToast('Categoria excluída.', 'success');
+
+  showConfirm(
+    `Excluir "${cat?.name || 'esta categoria'}"?`,
+    'Sim, excluir',
+    null,
+    async () => {
+      const { error } = await deleteCategory(_editCatId);
+      if (error) { showToast('Não foi possível excluir.'); return; }
+      window.appState.categories = await getCategories();
+      closeCatEditModal();
+      showToast('Categoria excluída.', 'success');
+    },
+    null
+  );
 }
 
 function initCatEditModal() {
@@ -207,14 +222,28 @@ function initCatEditModal() {
     const btn = e.target.closest('.cat-sub-delete-btn');
     if (!btn) return;
     const subId = btn.dataset.subDel;
-    const { error } = await deleteSubcategory(subId);
-    if (error) { showToast('Erro ao remover subcategoria.'); return; }
+    if (!await deleteSubcategoryGuarded(subId)) return;
     const cat = window.appState.categories.find(c => c.id === _editCatId);
     if (cat) {
       cat.subcategories = (cat.subcategories || []).filter(s => s.id !== subId);
       _renderSubcatList(cat.subcategories);
     }
   });
+}
+
+// Regra única de exclusão de subcategoria, usada tanto pelo × dos chips quanto
+// pelo botão do modal do picker: só exclui quando não há gasto vinculado.
+// Retorna true se realmente excluiu, para o chamador sincronizar o estado.
+async function deleteSubcategoryGuarded(subId) {
+  const { count, error: countErr } = await countExpensesBySubcategory(subId);
+  if (countErr) { showToast('Não foi possível verificar os gastos.'); return false; }
+  if (count > 0) {
+    showToast(`Não dá para excluir: ${count} gasto${count > 1 ? 's' : ''} nesta subcategoria.`);
+    return false;
+  }
+  const { error } = await deleteSubcategory(subId);
+  if (error) { showToast('Erro ao remover subcategoria.'); return false; }
+  return true;
 }
 
 // ── Orçamentos por mês ────────────────────────────────────────

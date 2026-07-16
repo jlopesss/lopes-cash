@@ -169,6 +169,28 @@ async function persistSubcategoryOrder(subs) {
   if (failed) throw failed.error;
 }
 
+// Conta gastos vinculados, para bloquear exclusão. `head: true` não traz linha
+// nenhuma, só o total no header — não adianta buscar os gastos em si.
+// Um gasto em subcategoria também aponta para a categoria, então contar por
+// category_id já cobre os gastos das subcategorias dela.
+async function countExpensesByCategory(categoryId) {
+  const { count, error } = await supabase
+    .from('expenses')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', uid())
+    .eq('category_id', categoryId);
+  return { count: count || 0, error };
+}
+
+async function countExpensesBySubcategory(subcategoryId) {
+  const { count, error } = await supabase
+    .from('expenses')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', uid())
+    .eq('subcategory_id', subcategoryId);
+  return { count: count || 0, error };
+}
+
 async function updateSubcategory(id, fields) {
   const { error } = await supabase
     .from('subcategories')

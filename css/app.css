@@ -1358,6 +1358,12 @@ body[data-view="orcamentos"] .fab {
 }
 
 /* ── Modal de confirmação (parcelas) ── */
+
+/* Todos os .modal-overlay compartilham z-index:100 e empilham por ordem no DOM.
+   O confirm vem antes de cat-edit/subcat-edit no HTML, mas é sempre o mais alto
+   da pilha (é aberto A PARTIR deles), então precisa vencer explicitamente. */
+#confirm-modal { z-index: 110; }
+
 .confirm-sheet {
   padding: 0 20px 8px;
 }
