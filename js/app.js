@@ -7,6 +7,28 @@ window.appState = {
   currentView: null,
 };
 
+// ── Troca de service worker ──────────────────────────────────
+// Quando um SW novo assume no meio do carregamento, a página fica com o
+// index.html do cache antigo mas passa a buscar os scripts do cache novo. Um
+// app.js novo com um HTML velho quebra no primeiro getElementById que só existe
+// no HTML novo. Recarregar na troca garante HTML e JS do mesmo deploy.
+//
+// Fica no topo do arquivo, fora do DOMContentLoaded, de propósito: se o boot
+// quebrar, este é justamente o mecanismo que traz a versão consistente de volta.
+if ('serviceWorker' in navigator) {
+  // Precisa ser lido AGORA: dentro do controllerchange o controller já é o novo.
+  // Sem controller, esta é a primeira instalação — não há shell velho na tela
+  // para conflitar, então recarregar só causaria um flash à toa.
+  const _hadController = !!navigator.serviceWorker.controller;
+  let _reloadingForSW  = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!_hadController || _reloadingForSW) return;
+    _reloadingForSW = true;
+    location.reload();
+  });
+}
+
 // ── Gerenciamento de histórico para modais (botão voltar) ─────
 
 let _modalSessionActive = false;
@@ -65,6 +87,25 @@ window.addEventListener('popstate', () => {
 
 // ── Inicialização ────────────────────────────────────────────
 
+// Cada init é isolado: uma tela cujo wiring falhe (elemento ausente porque o
+// shell em cache é de outro deploy, por exemplo) não pode derrubar as demais
+// nem impedir o navigate() e o pull-to-refresh que vêm depois — são eles que
+// deixam o app utilizável e permitem a recuperação.
+function initUI() {
+  const steps = [
+    initTabBar, initFAB, initHome, initExpenseModal, initBudgetModal,
+    initHistorico, initOrcamentos, initGraficos, initConfirmModal,
+    initOfflineBanner, initEditName, initCatEditModal, initPullToRefresh,
+  ];
+  steps.forEach(step => {
+    try {
+      step();
+    } catch (err) {
+      console.error(`Falha ao inicializar ${step.name}:`, err);
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Modo demo (sem Supabase configurado) ───────────────────
@@ -75,10 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('demo-banner').hidden = false;
 
-    initTabBar(); initFAB(); initHome(); initExpenseModal(); initBudgetModal();
-    initHistorico(); initOrcamentos(); initGraficos(); initConfirmModal();
-    initOfflineBanner(); initEditName(); initCatEditModal(); initPullToRefresh();
-
+    initUI();
     navigate(location.hash.slice(1) || 'home');
     return;
   }
@@ -107,19 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (event === 'SIGNED_OUT') window.location.href = '/auth.html';
   });
 
-  initTabBar();
-  initFAB();
-  initHome();
-  initExpenseModal();
-  initBudgetModal();
-  initHistorico();
-  initOrcamentos();
-  initGraficos();
-  initConfirmModal();
-  initOfflineBanner();
-  initEditName();
-  initCatEditModal();
-  initPullToRefresh();
+  initUI();
 
   const initialView = location.hash.slice(1) || 'home';
   navigate(initialView);
